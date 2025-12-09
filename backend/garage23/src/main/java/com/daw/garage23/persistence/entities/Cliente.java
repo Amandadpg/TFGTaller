@@ -38,7 +38,7 @@ public class Cliente {
 	@Column(length = 9)
 	private String telefono;
 	
-	@Column(length = 50)
+	@Column(length = 50, unique = true)
 	private String email;
 	
 	@Column(length = 80)
