@@ -1,5 +1,12 @@
 package com.daw.garage23.persistence.repositories;
 
-public class ServicioRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import com.daw.garage23.persistence.entities.Servicio;
+
+@Repository
+public interface ServicioRepository extends JpaRepository<Servicio, Integer>{
+
+	
 }

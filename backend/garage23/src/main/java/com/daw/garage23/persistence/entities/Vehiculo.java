@@ -3,6 +3,7 @@ package com.daw.garage23.persistence.entities;
 import java.util.List;
 
 import com.daw.garage23.persistence.entities.enums.Tipo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,7 +45,9 @@ public class Vehiculo {
 	
 	@ManyToOne
 	@JoinColumn(name = "id_cliente", referencedColumnName = "id", insertable = false, updatable = false)
+	@JsonIgnore
 	private Cliente cliente;
+	
 	
 	@OneToMany(mappedBy = "vehiculo")
 	private List<Cita> cita;
