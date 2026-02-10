@@ -1,5 +1,7 @@
 package com.daw.garage23.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,15 @@ public class VehiculoServices {
 
     @Autowired
     private ClienteRepository clienteRepository;
+    
+    public List<Vehiculo> listarVehiculosPorCliente(int clienteId) {
+
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new VehiculoException("Cliente no encontrado con id: " + clienteId));
+
+        return cliente.getVehiculo();
+    }
+
 
     public Vehiculo darAltaVehiculo(int clienteId, Vehiculo vehiculo) {
 

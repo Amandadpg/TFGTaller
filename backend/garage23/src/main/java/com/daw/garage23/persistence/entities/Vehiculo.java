@@ -3,12 +3,13 @@ package com.daw.garage23.persistence.entities;
 import java.util.List;
 
 import com.daw.garage23.persistence.entities.enums.Tipo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,11 +44,10 @@ public class Vehiculo {
 	@Enumerated(value = EnumType.STRING)
 	private Tipo tipo;
 	
-	@ManyToOne
-	@JoinColumn(name = "id_cliente", referencedColumnName = "id", insertable = false, updatable = false)
-	@JsonIgnore
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_cliente")
+	@JsonBackReference
 	private Cliente cliente;
-	
 	
 	@OneToMany(mappedBy = "vehiculo")
 	private List<Cita> cita;

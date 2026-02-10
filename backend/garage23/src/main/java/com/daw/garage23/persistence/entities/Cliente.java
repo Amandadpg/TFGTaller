@@ -5,6 +5,9 @@ package com.daw.garage23.persistence.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -46,10 +49,11 @@ public class Cliente {
 	@Column(length = 80)
 	private String direccion;
 	
-	@Column(length = 20, unique = true, nullable = true)
+	@Column(length = 20, nullable = true)
 	private String contrasena;
 	
-	@OneToMany(mappedBy = "cliente", fetch = FetchType.EAGER)
-	private List<Vehiculo> vehiculo = new ArrayList<>();;
+	@OneToMany(mappedBy = "cliente",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonManagedReference
+	private List<Vehiculo> vehiculo = new ArrayList<>();
 
 }
