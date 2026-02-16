@@ -13,7 +13,9 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, Integer>{
 	Optional<Vehiculo> findById(int id);
 
     boolean existsByMatricula(String matricula);
+    
+    boolean existsByMatriculaAndIdNot(String matricula, int id);
 
-    Optional<Vehiculo> findByClienteId(int clienteId);
+    Optional<Vehiculo> findByUsuarioId(int usuarioId);
 	
 }

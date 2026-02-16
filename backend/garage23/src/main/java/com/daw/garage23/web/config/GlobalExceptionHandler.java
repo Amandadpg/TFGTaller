@@ -3,23 +3,23 @@ package com.daw.garage23.web.config;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.daw.garage23.services.exceptions.Cliente.ClienteException;
-import com.daw.garage23.services.exceptions.Cliente.ClienteNotFoundException;
+import com.daw.garage23.services.exceptions.Usuario.UsuarioException;
+import com.daw.garage23.services.exceptions.Usuario.UsuarioNotFoundException;
 import com.daw.garage23.services.exceptions.Vehiculo.VehiculoException;
 
-@RestController
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 	
 	// --- Cliente ---
-    @ExceptionHandler(ClienteNotFoundException.class)
-    public ResponseEntity<String> handleClienteNotFound(ClienteNotFoundException ex) {
+    @ExceptionHandler(UsuarioNotFoundException.class)
+    public ResponseEntity<String> handleClienteNotFound(UsuarioNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
-    @ExceptionHandler(ClienteException.class)
-    public ResponseEntity<String> handleClienteBadRequest(ClienteException ex) {
+    @ExceptionHandler(UsuarioException.class)
+    public ResponseEntity<String> handleClienteBadRequest(UsuarioException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

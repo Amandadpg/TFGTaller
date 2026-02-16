@@ -8,5 +8,6 @@ import com.daw.garage23.persistence.entities.Servicio;
 @Repository
 public interface ServicioRepository extends JpaRepository<Servicio, Integer>{
 
+	boolean existsByNombreServicio(String nombreServicio);
 	
 }

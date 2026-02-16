@@ -45,9 +45,9 @@ public class Vehiculo {
 	private Tipo tipo;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_cliente")
+	@JoinColumn(name = "id_usuario")
 	@JsonBackReference
-	private Cliente cliente;
+	private Usuario usuario;
 	
 	@OneToMany(mappedBy = "vehiculo")
 	private List<Cita> cita;

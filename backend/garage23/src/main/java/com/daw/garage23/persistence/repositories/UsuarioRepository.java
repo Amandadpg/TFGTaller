@@ -6,12 +6,12 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 import org.yaml.snakeyaml.events.Event.ID;
 
-import com.daw.garage23.persistence.entities.Cliente;
+import com.daw.garage23.persistence.entities.Usuario;
 
 @Repository
-public interface ClienteRepository extends ListCrudRepository<Cliente, Integer>{
+public interface UsuarioRepository extends ListCrudRepository<Usuario, Integer>{
 	
-	Optional<Cliente> findByEmail(String email);
+	Optional<Usuario> findByEmail(String email);
 	
 	boolean existsByEmailAndIdNot(String email, Integer id);
 
