@@ -6,11 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.daw.garage23.persistence.entities.Usuario;
-import com.daw.garage23.persistence.entities.enums.Rol;
 import com.daw.garage23.persistence.repositories.UsuarioRepository;
-import com.daw.garage23.services.dto.UsuarioRegistroDTO;
+import com.daw.garage23.services.dto.Usuarios.UsuarioRegistroRequestDTO;
+import com.daw.garage23.services.dto.Usuarios.UsuarioResponseDTO;
 import com.daw.garage23.services.exceptions.Usuario.UsuarioException;
 import com.daw.garage23.services.exceptions.Usuario.UsuarioNotFoundException;
+import com.daw.garage23.services.mapper.UsuarioMapper;
 
 @Service
 public class UsuarioServices {
@@ -19,8 +20,9 @@ public class UsuarioServices {
 	private UsuarioRepository usuarioRepository;
 	
 	//Solo admin
-	public List<Usuario> listarTodosUsuarios() {
-	    return usuarioRepository.findAll();
+	public List<UsuarioResponseDTO> listarTodosUsuarios() {
+	    List<Usuario> usuarios = usuarioRepository.findAll();
+	    return UsuarioMapper.toResponseDTOList(usuarios);
 	}
 	
 	//Solo admin
@@ -28,41 +30,52 @@ public class UsuarioServices {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioException("El usuario con id " + id + " no se ha encontrado."));
     }
+	
+	
+	//Admin
+	public List<UsuarioResponseDTO> buscarUsuariosPorNombre(String nombre) {
+	    List<Usuario> usuarios = usuarioRepository.findByNombreContainingIgnoreCase(nombre);
+	    
+	    if (usuarios.isEmpty()) {
+	        throw new UsuarioException("No se encontraron usuarios con nombre que contenga: " + nombre);
+	    }
+
+	    return usuarios.stream()
+	               .map(UsuarioMapper::toResponseDTO)
+	               .toList();
+	}
 
 	
 	//Cliente y admin
-	public Usuario registrarUsuario(UsuarioRegistroDTO dto) {
+	public UsuarioResponseDTO registrar(UsuarioRegistroRequestDTO request) throws UsuarioException {
 
-        // Validar email y DNI duplicados
-        if (usuarioRepository.existsByEmail(dto.getEmail())) {
-            throw new UsuarioException("Este email ya ha sido registrado por otra cuenta.");
-        }
-        if (usuarioRepository.existsByDni(dto.getDni())) {
-            throw new UsuarioException("Este DNI ya ha sido registrado po otra cuenta.");
-        }
+	    if (usuarioRepository.existsByEmail(request.getEmail())) {
+	        throw new UsuarioException("Ya existe un usuario con ese email");
+	    }
 
-        // Validar contraseñas
-        if (!dto.getContrasena().equals(dto.getConfirmarContrasena())) {
-            throw new UsuarioException("Las contraseña no coinciden.");
-        }
+	    Usuario usuario = UsuarioMapper.fromRegistroDTO(
+	        request.getNombre(),
+	        request.getEmail(),
+	        request.getContrasena()
+	    );
 
-        if (!esContrasenaValida(dto.getContrasena())) {
-            throw new UsuarioException("La contraseña debe tener al menos 8 caracteres, incluyendo una letra y un número");
-        }
+	    Usuario guardado = usuarioRepository.save(usuario);
 
-        // Crear cliente
-        Usuario usuario = new Usuario();
-        usuario.setNombre(dto.getNombre());
-        usuario.setApellidos(dto.getApellidos());
-        usuario.setDni(dto.getDni());
-        usuario.setEmail(dto.getEmail());
-        usuario.setTelefono(dto.getTelefono());
-        usuario.setDireccion(dto.getDireccion());
-        usuario.setContrasena(dto.getContrasena()); // luego cifrar con Spring Security
-        usuario.setRol(Rol.CLIENTE);
+	    return UsuarioMapper.toResponseDTO(guardado);
+	}
+	
+	//Cliente y admin
+	public UsuarioResponseDTO login(String email, String contrasena) {
 
-        return usuarioRepository.save(usuario);
-    }
+	    Usuario usuario = usuarioRepository.findByEmail(email)
+	            .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
+
+	    if (!usuario.getContrasena().equals(contrasena)) {
+	        throw new UsuarioException("Contraseña incorrecta");
+	    }
+
+	    return UsuarioMapper.toResponseDTO(usuario);
+	}
 
 	
 	//Cliente y admin
@@ -117,18 +130,18 @@ public class UsuarioServices {
 	
 	
 	//Otros metodos
-    private boolean esContrasenaValida(String contrasena) {
-        if (contrasena.length() < 8) return false;
-        boolean tieneLetra = false;
-        boolean tieneNumero = false;
-
-        for (char c : contrasena.toCharArray()) {
-            if (Character.isLetter(c)) tieneLetra = true;
-            else if (Character.isDigit(c)) tieneNumero = true;
-        }
-
-        return tieneLetra && tieneNumero;
-    }
+//    private boolean esContrasenaValida(String contrasena) {
+//        if (contrasena.length() < 8) return false;
+//        boolean tieneLetra = false;
+//        boolean tieneNumero = false;
+//
+//        for (char c : contrasena.toCharArray()) {
+//            if (Character.isLetter(c)) tieneLetra = true;
+//            else if (Character.isDigit(c)) tieneNumero = true;
+//        }
+//
+//        return tieneLetra && tieneNumero;
+//    }
 	
 	
 	

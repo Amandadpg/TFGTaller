@@ -9,7 +9,9 @@ import com.daw.garage23.persistence.entities.Usuario;
 import com.daw.garage23.persistence.entities.Vehiculo;
 import com.daw.garage23.persistence.repositories.UsuarioRepository;
 import com.daw.garage23.persistence.repositories.VehiculoRepository;
+import com.daw.garage23.services.dto.Vehiculos.VehiculoResponseDTO;
 import com.daw.garage23.services.exceptions.Vehiculo.VehiculoException;
+import com.daw.garage23.services.mapper.VehiculoMapper;
 
 @Service
 public class VehiculoServices {
@@ -21,63 +23,82 @@ public class VehiculoServices {
     private UsuarioRepository usuarioRepository;
     
     //Admin
-    public List<Vehiculo> listarTodosVehiculos() {
-        return vehiculoRepository.findAll();
+    public List<VehiculoResponseDTO> listarTodosVehiculos() {
+        List<Vehiculo> vehiculos = vehiculoRepository.findAll();
+        return VehiculoMapper.toResponseDTOList(vehiculos);
     }
     
     //Admin
-    public List<Vehiculo> listarVehiculosPorUsuario(int usuarioId) {
-
+    public List<VehiculoResponseDTO> listarVehiculosPorUsuario(int usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new VehiculoException("Usuario no encontrado con id: " + usuarioId));
 
-        return usuario.getVehiculo();
+        return VehiculoMapper.toResponseDTOList(usuario.getVehiculo());
+    }
+    
+    //Admin
+    public List<VehiculoResponseDTO> buscarVehiculosPorMatricula(String matricula) {
+        List<Vehiculo> vehiculos = vehiculoRepository.findByMatriculaContainingIgnoreCase(matricula);
+
+        if (vehiculos.isEmpty()) {
+            throw new VehiculoException("No se encontraron vehículos con matrícula que contenga: " + matricula);
+        }
+
+        return VehiculoMapper.toResponseDTOList(vehiculos);
+    }
+    
+    
+    //Admin
+    public List<VehiculoResponseDTO> buscarVehiculosPorMarca(String marca) {
+        List<Vehiculo> vehiculos = vehiculoRepository.findByMarcaContainingIgnoreCase(marca);
+
+        if (vehiculos.isEmpty()) {
+            throw new VehiculoException("No se encontraron vehículos con marca que contenga: " + marca);
+        }
+
+        return VehiculoMapper.toResponseDTOList(vehiculos);
     }
 
     //Admin y cliente
-    public Vehiculo darAltaVehiculo(int usuarioId, Vehiculo vehiculo) {
+    public VehiculoResponseDTO darAltaVehiculo(int usuarioId, Vehiculo vehiculo) {
 
-        // Comprobar Usuario existe
-    	//Este solo lo usaria el admin ya que el Usuario ya habra iniciado sesion con su cuenta
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new VehiculoException("El usuario no se ha encontrado."));
 
-        // Matrícula única
         if (vehiculoRepository.existsByMatricula(vehiculo.getMatricula())) {
             throw new VehiculoException("Esta matrícula ya está registrada por otra cuenta.");
         }
 
-        // Validaciones básicas
         if (vehiculo.getMatricula() == null || vehiculo.getMatricula().isBlank()) {
-            throw new VehiculoException("Es necesario que inserte su matricula.");
+            throw new VehiculoException("Es necesario que inserte su matrícula.");
         }
-        
+
         if (vehiculo.getMarca() == null || vehiculo.getMarca().isBlank()) {
-            throw new VehiculoException("Es necesario que inserte la marca de su vehiculo.");
+            throw new VehiculoException("Es necesario que inserte la marca de su vehículo.");
         }
-        
+
         if (vehiculo.getModelo() == null || vehiculo.getModelo().isBlank()) {
-            throw new VehiculoException("Es necesario que inserte el modelo de su vehiculo.");
+            throw new VehiculoException("Es necesario que inserte el modelo de su vehículo.");
         }
 
         if (vehiculo.getTipo() == null) {
-            throw new VehiculoException("Por favor, especifique que tipo de vehiculo tiene.");
+            throw new VehiculoException("Por favor, especifique el tipo de vehículo.");
         }
-        
 
         vehiculo.setUsuario(usuario);
         usuario.getVehiculo().add(vehiculo);
-        return vehiculoRepository.save(vehiculo);
+
+        Vehiculo guardado = vehiculoRepository.save(vehiculo);
+        return VehiculoMapper.toResponseDTO(guardado);
     }
     
     //Admin y cliente
  // Modificar vehículo (sin usuarioId como parámetro)
-    public Vehiculo modificarVehiculo(int vehiculoId, Vehiculo vehiculoNuevo) {
-        // Buscar vehículo
-        Vehiculo vehiculoExistente = vehiculoRepository.findById(vehiculoId)
-            .orElseThrow(() -> new VehiculoException("Vehículo no encontrado"));
+    public VehiculoResponseDTO modificarVehiculo(int vehiculoId, Vehiculo vehiculoNuevo) {
 
-        // Validaciones de campos
+        Vehiculo vehiculoExistente = vehiculoRepository.findById(vehiculoId)
+                .orElseThrow(() -> new VehiculoException("Vehículo no encontrado"));
+
         if (vehiculoNuevo.getMatricula() == null || vehiculoNuevo.getMatricula().isBlank()) {
             throw new VehiculoException("Debe introducir la matrícula del vehículo.");
         }
@@ -86,26 +107,20 @@ public class VehiculoServices {
             throw new VehiculoException("La matrícula ya está registrada por otro vehículo.");
         }
 
-        // Actualizar datos
         vehiculoExistente.setMatricula(vehiculoNuevo.getMatricula());
         vehiculoExistente.setMarca(vehiculoNuevo.getMarca());
         vehiculoExistente.setModelo(vehiculoNuevo.getModelo());
         vehiculoExistente.setTipo(vehiculoNuevo.getTipo());
 
-        // Guardar cambios
-        return vehiculoRepository.save(vehiculoExistente);
+        Vehiculo guardado = vehiculoRepository.save(vehiculoExistente);
+        return VehiculoMapper.toResponseDTO(guardado);
     }
 
     // Eliminar vehículo (sin usuarioId como parámetro)
     public void eliminarVehiculo(int vehiculoId) {
-        // Buscar vehículo
         Vehiculo vehiculo = vehiculoRepository.findById(vehiculoId)
                 .orElseThrow(() -> new VehiculoException("El vehículo con id " + vehiculoId + " no se ha encontrado."));
 
-        // Aquí podrías agregar validación de rol o propietario si quieres
-        // por ejemplo, con Spring Security después
-
-        // Eliminar
         vehiculoRepository.delete(vehiculo);
     }
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.daw.garage23.persistence.entities.enums.Tipo;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,5 +51,6 @@ public class Vehiculo {
 	private Usuario usuario;
 	
 	@OneToMany(mappedBy = "vehiculo")
+	@JsonIgnore
 	private List<Cita> cita;
 }

@@ -40,11 +40,11 @@ public class Cita {
 	private Estado estado;
 	
 	@ManyToOne
-	@JoinColumn(name = "id_vehiculo", referencedColumnName = "id", insertable = false, updatable = false)
+	@JoinColumn(name = "id_vehiculo", nullable = false)
 	private Vehiculo vehiculo;
 	
 	@ManyToOne
-	@JoinColumn(name = "id_servicio", referencedColumnName = "id", insertable = false, updatable = false)
+	@JoinColumn(name = "id_servicio", nullable = false)
 	private Servicio servicio;
 	
 }

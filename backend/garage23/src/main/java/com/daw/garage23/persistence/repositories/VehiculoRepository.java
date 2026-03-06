@@ -1,5 +1,6 @@
 package com.daw.garage23.persistence.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,5 +18,10 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, Integer>{
     boolean existsByMatriculaAndIdNot(String matricula, int id);
 
     Optional<Vehiculo> findByUsuarioId(int usuarioId);
+    
+    List<Vehiculo> findByMatriculaContainingIgnoreCase(String matricula);
+    
+    List<Vehiculo> findByMarcaContainingIgnoreCase(String marca);
+
 	
 }

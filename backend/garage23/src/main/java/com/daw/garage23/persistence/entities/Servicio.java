@@ -2,6 +2,8 @@ package com.daw.garage23.persistence.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,19 +26,20 @@ public class Servicio {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column(length = 40)
+	@Column(name = "nombre_servicio",length = 40)
 	private String nombreServicio;
 	
-	@Column(length = 70)
+	@Column(length = 150)
 	private String descripcion;
 	
 	@Column(columnDefinition = "DECIMAL(6,2)")
 	private double precio;
 	
 	@Column(name = "duracion_minutos")
-	private int duracionMinutos;
+	private Integer duracionMinutos;
 	
 	@OneToMany(mappedBy = "servicio")
+	@JsonIgnore
 	private List<Cita> cita;
 	
 
