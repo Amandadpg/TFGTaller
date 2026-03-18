@@ -7,11 +7,13 @@ import org.springframework.stereotype.Service;
 
 import com.daw.garage23.persistence.entities.Usuario;
 import com.daw.garage23.persistence.entities.Vehiculo;
-import com.daw.garage23.persistence.repositories.UsuarioRepository;
 import com.daw.garage23.persistence.repositories.VehiculoRepository;
+import com.daw.garage23.services.dto.Vehiculos.VehiculoRequestDTO;
 import com.daw.garage23.services.dto.Vehiculos.VehiculoResponseDTO;
 import com.daw.garage23.services.exceptions.Vehiculo.VehiculoException;
 import com.daw.garage23.services.mapper.VehiculoMapper;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class VehiculoServices {
@@ -19,8 +21,8 @@ public class VehiculoServices {
 	@Autowired
 	private VehiculoRepository vehiculoRepository;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+	@Autowired
+    private UsuarioServices usuarioServices;
     
     //Admin
     public List<VehiculoResponseDTO> listarTodosVehiculos() {
@@ -28,11 +30,19 @@ public class VehiculoServices {
         return VehiculoMapper.toResponseDTOList(vehiculos);
     }
     
+ 
+    public Vehiculo buscarEntidadPorId(int id) {
+        return vehiculoRepository.findById(id)
+                .orElseThrow(() -> new VehiculoException("Vehículo no encontrado con id: " + id));
+    }
+    
     //Admin
     public List<VehiculoResponseDTO> listarVehiculosPorUsuario(int usuarioId) {
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new VehiculoException("Usuario no encontrado con id: " + usuarioId));
+        // 1. Llamamos al servicio de usuarios usando el ID que entra por parámetro
+        // 2. No ponemos orElseThrow aquí porque ya está dentro de buscarEntidadPorId
+        Usuario usuario = usuarioServices.buscarEntidadPorId(usuarioId);
 
+        // 3. Retornamos la lista mapeada a DTO
         return VehiculoMapper.toResponseDTOList(usuario.getVehiculo());
     }
     
@@ -60,61 +70,50 @@ public class VehiculoServices {
     }
 
     //Admin y cliente
-    public VehiculoResponseDTO darAltaVehiculo(int usuarioId, Vehiculo vehiculo) {
+    public VehiculoResponseDTO darAltaVehiculo(VehiculoRequestDTO dto) {
+        // Validamos si el usuario existe
+    	Usuario usuario = usuarioServices.buscarEntidadPorId(dto.getUsuarioId());
 
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new VehiculoException("El usuario no se ha encontrado."));
-
-        if (vehiculoRepository.existsByMatricula(vehiculo.getMatricula())) {
-            throw new VehiculoException("Esta matrícula ya está registrada por otra cuenta.");
+        if (vehiculoRepository.existsByMatricula(dto.getMatricula())) {
+            throw new VehiculoException("Esta matrícula ya está registrada.");
         }
 
-        if (vehiculo.getMatricula() == null || vehiculo.getMatricula().isBlank()) {
-            throw new VehiculoException("Es necesario que inserte su matrícula.");
-        }
-
-        if (vehiculo.getMarca() == null || vehiculo.getMarca().isBlank()) {
-            throw new VehiculoException("Es necesario que inserte la marca de su vehículo.");
-        }
-
-        if (vehiculo.getModelo() == null || vehiculo.getModelo().isBlank()) {
-            throw new VehiculoException("Es necesario que inserte el modelo de su vehículo.");
-        }
-
-        if (vehiculo.getTipo() == null) {
-            throw new VehiculoException("Por favor, especifique el tipo de vehículo.");
-        }
-
+        // Convertimos DTO a Entidad
+        Vehiculo vehiculo = VehiculoMapper.toEntity(dto);
         vehiculo.setUsuario(usuario);
-        usuario.getVehiculo().add(vehiculo);
 
         Vehiculo guardado = vehiculoRepository.save(vehiculo);
         return VehiculoMapper.toResponseDTO(guardado);
     }
-    
-    //Admin y cliente
- // Modificar vehículo (sin usuarioId como parámetro)
-    public VehiculoResponseDTO modificarVehiculo(int vehiculoId, Vehiculo vehiculoNuevo) {
 
-        Vehiculo vehiculoExistente = vehiculoRepository.findById(vehiculoId)
+    @Transactional
+    public VehiculoResponseDTO modificarVehiculo(int vehiculoId, VehiculoRequestDTO dto) {
+        // 1. Buscamos el vehículo que queremos editar
+        Vehiculo vehiculo = vehiculoRepository.findById(vehiculoId)
                 .orElseThrow(() -> new VehiculoException("Vehículo no encontrado"));
 
-        if (vehiculoNuevo.getMatricula() == null || vehiculoNuevo.getMatricula().isBlank()) {
-            throw new VehiculoException("Debe introducir la matrícula del vehículo.");
+        // 2. SEGURIDAD: Comprobar si el vehículo pertenece al usuario que envía la petición
+        // (Esto evita que el Usuario A edite el coche del Usuario B)
+        if (vehiculo.getUsuario().getId() != dto.getUsuarioId()) {
+            throw new VehiculoException("Error: No tienes permiso para modificar este vehículo.");
         }
 
-        if (vehiculoRepository.existsByMatriculaAndIdNot(vehiculoNuevo.getMatricula(), vehiculoId)) {
-            throw new VehiculoException("La matrícula ya está registrada por otro vehículo.");
+        // 3. Si la matrícula cambia, comprobar que la nueva no esté ya registrada en otro coche
+        if (!vehiculo.getMatricula().equals(dto.getMatricula()) && 
+             vehiculoRepository.existsByMatricula(dto.getMatricula())) {
+            throw new VehiculoException("La nueva matrícula ya existe en el sistema.");
         }
 
-        vehiculoExistente.setMatricula(vehiculoNuevo.getMatricula());
-        vehiculoExistente.setMarca(vehiculoNuevo.getMarca());
-        vehiculoExistente.setModelo(vehiculoNuevo.getModelo());
-        vehiculoExistente.setTipo(vehiculoNuevo.getTipo());
+        // 4. Actualizamos los datos
+        vehiculo.setMatricula(dto.getMatricula());
+        vehiculo.setMarca(dto.getMarca());
+        vehiculo.setModelo(dto.getModelo());
+        vehiculo.setTipo(dto.getTipo());
 
-        Vehiculo guardado = vehiculoRepository.save(vehiculoExistente);
-        return VehiculoMapper.toResponseDTO(guardado);
+        return VehiculoMapper.toResponseDTO(vehiculoRepository.save(vehiculo));
     }
+    
+
 
     // Eliminar vehículo (sin usuarioId como parámetro)
     public void eliminarVehiculo(int vehiculoId) {

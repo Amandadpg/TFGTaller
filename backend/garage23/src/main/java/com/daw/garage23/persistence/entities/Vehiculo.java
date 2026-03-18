@@ -6,6 +6,7 @@ import com.daw.garage23.persistence.entities.enums.Tipo;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -50,7 +51,7 @@ public class Vehiculo {
 	@JsonBackReference
 	private Usuario usuario;
 	
-	@OneToMany(mappedBy = "vehiculo")
+	@OneToMany(mappedBy = "vehiculo", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Cita> cita;
 }

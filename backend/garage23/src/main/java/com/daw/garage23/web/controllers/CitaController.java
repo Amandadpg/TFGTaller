@@ -3,12 +3,13 @@ package com.daw.garage23.web.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,20 +29,46 @@ public class CitaController {
 	
 	//Listar todas las citas
 	@GetMapping
-	public ResponseEntity<List<CitaResponseDTO>> listar() {
-	    return ResponseEntity.ok(citaServices.listarTodas());
-	}
-
-	//Reservar una cita
-	@PostMapping
-	public ResponseEntity<CitaResponseDTO> reservar(@RequestBody CitaRequestDTO dto) {
-	    return ResponseEntity.status(HttpStatus.CREATED).body(citaServices.reservar(dto));
+    public ResponseEntity<List<CitaResponseDTO>> obtenerTodas() {
+        return ResponseEntity.ok(citaServices.listarTodas());
+    }
+	
+	@GetMapping("/{id}")
+	public ResponseEntity<CitaResponseDTO> buscarPorId(@PathVariable int id) {
+	    CitaResponseDTO respuesta = citaServices.buscarPorId(id);
+	    return ResponseEntity.ok(respuesta);
 	}
 	
-	//Cambiar solo el estado de la cita
-	@PatchMapping("/{id}/estado")
-	public ResponseEntity<CitaResponseDTO> cambiarEstado(@PathVariable int id, @RequestParam Estado estado) {
-	    return ResponseEntity.ok(citaServices.cambiarEstado(id, estado));
+	@GetMapping("/buscar")
+	public ResponseEntity<List<CitaResponseDTO>> buscarPorNombre(@RequestParam String nombre) {
+	    List<CitaResponseDTO> lista = citaServices.buscarCitasPorNombreUsuario(nombre);
+	    return ResponseEntity.ok(lista);
 	}
+
+    @PostMapping("/reservar")
+    public ResponseEntity<CitaResponseDTO> reservar(@RequestBody CitaRequestDTO request) {
+        return ResponseEntity.ok(citaServices.reservar(request));
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<CitaResponseDTO> cambiarEstado(
+            @PathVariable int id, 
+            @RequestParam Estado nuevoEstado) {
+        return ResponseEntity.ok(citaServices.cambiarEstado(id, nuevoEstado));
+    }
+    
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<CitaResponseDTO> modificarCita(
+            @PathVariable int id, 
+            @RequestBody CitaRequestDTO dto) {
+        return ResponseEntity.ok(citaServices.modificarCita(id, dto));
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> eliminarCita(@PathVariable int id) {
+        citaServices.eliminarCita(id);
+        return ResponseEntity.ok("Cita eliminada correctamente del sistema.");
+    }
 
 }

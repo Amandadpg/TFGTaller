@@ -3,7 +3,12 @@ package com.daw.garage23.persistence.entities;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.daw.garage23.persistence.entities.enums.Rol;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -40,7 +45,7 @@ public class Usuario {
 	@Column(length = 70)
 	private String apellidos;
 	
-	@Column(length = 9, unique = true, nullable = true)
+	@Column(length = 10, unique = true, nullable = false)
 	private String dni;
 	
 	@Column(length = 9)
@@ -52,14 +57,17 @@ public class Usuario {
 	@Column(length = 80)
 	private String direccion;
 	
-	@Column(length = 20, nullable = true)
+	@Column(length = 120, nullable = true)
 	private String contrasena;
 	
 	@Enumerated(value = EnumType.STRING)
 	private Rol rol;
 	
-	@OneToMany(mappedBy = "usuario",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "usuario",cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)
 	@JsonManagedReference
 	private List<Vehiculo> vehiculo = new ArrayList<>();
+	
+
+
 
 }

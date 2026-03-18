@@ -19,6 +19,7 @@ public class CitaRequestDTO {
 
     @JsonFormat(pattern = "HH:mm")
     private LocalTime hora;
+    private String estado;
     private int vehiculoId;
     private int servicioId;
 }

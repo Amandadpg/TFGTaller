@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,11 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.daw.garage23.persistence.entities.Usuario;
 import com.daw.garage23.services.UsuarioServices;
+import com.daw.garage23.services.dto.Usuarios.UsuarioContrasenaRequestDTO;
 import com.daw.garage23.services.dto.Usuarios.UsuarioLoginRequestDTO;
 import com.daw.garage23.services.dto.Usuarios.UsuarioRegistroRequestDTO;
 import com.daw.garage23.services.dto.Usuarios.UsuarioResponseDTO;
+import com.daw.garage23.services.dto.Usuarios.UsuarioUpdateRequestDTO;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -28,16 +30,16 @@ public class UsuarioController {
     private UsuarioServices usuarioServices;
 
     // Mostrar todos los Usuarios
-    @GetMapping("/")
-    public ResponseEntity<List<Usuario>> obtenerTodosUsuarios() {
-        return ResponseEntity.ok(usuarioServices.listarTodosUsuarios());
-    }
+	@GetMapping("/")
+	public ResponseEntity<List<UsuarioResponseDTO>> obtenerTodosUsuarios() {
+	    return ResponseEntity.ok(usuarioServices.listarTodosUsuarios());
+	}
 
     // Mostrar Usuario por id
-    @GetMapping("/{id}")
-    public ResponseEntity<Usuario> obtenerUsuario(@PathVariable int id) {
-        return ResponseEntity.ok(usuarioServices.obtenerUsuarioPorId(id));
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<UsuarioResponseDTO> obtenerUsuario(@PathVariable int id) {
+	    return ResponseEntity.ok(usuarioServices.obtenerUsuarioPorId(id));
+	}
     
     // Mostrar usuario por nombre
     @GetMapping("/buscar")
@@ -55,8 +57,15 @@ public class UsuarioController {
 
     // Modificar Usuario
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> modificarUsuario(@PathVariable int id, @RequestBody Usuario usuarioNuevo) {
-        return ResponseEntity.ok(usuarioServices.modificarUsuario(id, usuarioNuevo));
+    public ResponseEntity<UsuarioResponseDTO> modificarUsuario( @PathVariable int id, @RequestBody UsuarioUpdateRequestDTO request) {
+        return ResponseEntity.ok(usuarioServices.modificarUsuario(id, request));
+    }
+
+    // --- ENDPOINT PARA CAMBIAR CONTRASEÑA ---
+    @PatchMapping("/{id}/contrasena")
+    public ResponseEntity<String> cambiarContrasena(@PathVariable int id, @RequestBody UsuarioContrasenaRequestDTO request) {
+        usuarioServices.cambiarContrasena(id, request);
+        return ResponseEntity.ok("Contraseña actualizada con éxito");
     }
     
     //Iniciar sesion

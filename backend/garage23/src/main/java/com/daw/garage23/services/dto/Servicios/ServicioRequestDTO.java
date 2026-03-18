@@ -1,19 +1,16 @@
 package com.daw.garage23.services.dto.Servicios;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ServicioResponseDTO {
+public class ServicioRequestDTO {
 
-	private int id;
-    private String nombreServicio;
+	private String nombreServicio;
     private String descripcion;
     private double precio;
-    private int duracionMinutos;
+    private Integer duracionMinutos;
 }

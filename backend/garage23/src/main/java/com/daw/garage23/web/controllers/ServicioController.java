@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.daw.garage23.persistence.entities.Servicio;
 import com.daw.garage23.services.ServicioServices;
+import com.daw.garage23.services.dto.Servicios.ServicioRequestDTO;
 import com.daw.garage23.services.dto.Servicios.ServicioResponseDTO;
-import com.daw.garage23.services.exceptions.Servicio.ServicioException;
 
 @RestController
 @RequestMapping("/servicios")
@@ -26,35 +25,41 @@ public class ServicioController {
 	@Autowired
     private ServicioServices servicioServices;
 	
-	//Listar todos los servicios
-	@GetMapping
-	public List<Servicio> listarServicios() {
-	    return servicioServices.listarTodosServicios();
-	}
+	// Admin y usuario
+    // Listar todos los servicios
+    @GetMapping("/")
+    public ResponseEntity<List<ServicioResponseDTO>> listarServicios() {
+        return ResponseEntity.ok(servicioServices.listarTodosServicios());
+    }
 
+    // Admin
+    // Añadir servicio
+    @PostMapping("/")
+    public ResponseEntity<ServicioResponseDTO> crearServicio(@RequestBody ServicioRequestDTO request) {
+        return ResponseEntity.ok(servicioServices.añadirServicio(request));
+    }
 
-    // Añadir un nuevo servicio
-	@PostMapping("/crear")
-    public Servicio crearServicio(@RequestBody Servicio servicio) {
-        return servicioServices.añadirServicio(servicio);
-    }	
-	
-	//Modificar un servicio
-	@PutMapping("/{id}")
-	public Servicio modificarServicio(@PathVariable int id, @RequestBody Servicio servicio) {
-	    return servicioServices.modificarServicio(id, servicio);
-	}
+    // Admin
+    // Modificar servicio
+    @PutMapping("/{id}")
+    public ResponseEntity<ServicioResponseDTO> actualizarServicio(
+            @PathVariable int id, 
+            @RequestBody ServicioRequestDTO request) {
+        return ResponseEntity.ok(servicioServices.modificarServicio(id, request));
+    }
 
+    // Admin
+    // Eliminar servicio
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> eliminarServicio(@PathVariable int id) {
+        servicioServices.eliminarServicio(id);
+        return ResponseEntity.ok("Servicio eliminado correctamente");
+    }
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<String> eliminarServicio(@PathVariable int id) {
-	    servicioServices.eliminarServicio(id);
-	    return ResponseEntity.ok("Servicio eliminado correctamente");
-	}
-	
-	@GetMapping("/buscar")
-	public ResponseEntity<List<ServicioResponseDTO>> buscarServiciosPorNombre(@RequestParam String nombre) {
-	    List<ServicioResponseDTO> servicios = servicioServices.buscarServiciosPorNombre(nombre);
-	    return ResponseEntity.ok(servicios);
-	}
+    // Admin y usuario
+    // Buscar servicio por nombre
+    @GetMapping("/buscar")
+    public ResponseEntity<List<ServicioResponseDTO>> buscarPorNombre(@RequestParam String nombre) {
+        return ResponseEntity.ok(servicioServices.buscarServiciosPorNombre(nombre));
+    }
 }

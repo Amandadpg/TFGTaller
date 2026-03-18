@@ -16,7 +16,7 @@ public class VehiculoResponseDTO {
     private String marca;
     private String modelo;
     private String tipo;
-    private Integer usuarioId;
-    private String nombreUsuario;
+    private int usuarioId;
+    private String nombreDueno;
     
 }

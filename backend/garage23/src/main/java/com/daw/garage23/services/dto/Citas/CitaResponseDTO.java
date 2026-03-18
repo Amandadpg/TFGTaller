@@ -16,7 +16,7 @@ public class CitaResponseDTO {
     private LocalDate fecha;
     private LocalTime hora;
     private String estado;
-
-    private String matriculaVehiculo;
+    private String matriculaVehiculo; 
     private String nombreServicio;
+
 }

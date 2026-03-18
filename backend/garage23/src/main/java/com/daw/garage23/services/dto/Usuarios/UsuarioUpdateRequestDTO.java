@@ -7,15 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UsuarioRegistroRequestDTO {
+public class UsuarioUpdateRequestDTO {
 
 	private String nombre;
-    private String apellidos;
-    private String email;
+	private String apellidos;
+	private String email;
     private String dni;
     private String telefono;
     private String direccion;
-    private String contrasena;
-    private String confirmarContrasena;
-	
 }
