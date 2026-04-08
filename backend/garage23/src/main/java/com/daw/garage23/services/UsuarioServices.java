@@ -164,30 +164,11 @@ public class UsuarioServices implements UserDetailsService{
         usuarioRepository.delete(usuario);
     }
 
-
-	
-	
-	//Otros metodos
-//    private boolean esContrasenaValida(String contrasena) {
-//        if (contrasena.length() < 8) return false;
-//        boolean tieneLetra = false;
-//        boolean tieneNumero = false;
-//
-//        for (char c : contrasena.toCharArray()) {
-//            if (Character.isLetter(c)) tieneLetra = true;
-//            else if (Character.isDigit(c)) tieneNumero = true;
-//        }
-//
-//        return tieneLetra && tieneNumero;
-//    }
-	
-	
+ // Añade esto a UsuarioServices para que la seguridad funcione
+    public boolean esElMismoUsuario(int id, String emailAutenticado) {
+        UsuarioResponseDTO usuario = obtenerUsuarioPorId(id);
+        return usuario.getEmail().equals(emailAutenticado);
+    }
 	
 
-
-	
-	
-	
-	
-	
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,60 +27,66 @@ import com.daw.garage23.services.dto.Usuarios.UsuarioUpdateRequestDTO;
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
-	@Autowired
+    @Autowired
     private UsuarioServices usuarioServices;
 
-    // Mostrar todos los Usuarios
-	@GetMapping("/")
-	public ResponseEntity<List<UsuarioResponseDTO>> obtenerTodosUsuarios() {
-	    return ResponseEntity.ok(usuarioServices.listarTodosUsuarios());
-	}
+    // 1. Mostrar todos los Usuarios: Solo el jefe (ADMIN)
+    @GetMapping("/")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UsuarioResponseDTO>> obtenerTodosUsuarios() {
+        return ResponseEntity.ok(usuarioServices.listarTodosUsuarios());
+    }
 
-    // Mostrar Usuario por id
-	@GetMapping("/{id}")
-	public ResponseEntity<UsuarioResponseDTO> obtenerUsuario(@PathVariable int id) {
-	    return ResponseEntity.ok(usuarioServices.obtenerUsuarioPorId(id));
-	}
+    // 2. Mostrar Usuario por ID: El ADMIN o el propio DUEÑO de la cuenta
+    // CORRECCIÓN: He cambiado @citaServices por @usuarioServices, que es lo lógico aquí.
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @usuarioServices.esElMismoUsuario(#id, authentication.name)")
+    public ResponseEntity<UsuarioResponseDTO> obtenerUsuario(@PathVariable int id) {
+        return ResponseEntity.ok(usuarioServices.obtenerUsuarioPorId(id));
+    }
     
-    // Mostrar usuario por nombre
+    // 3. Buscar por nombre: Solo ADMIN
     @GetMapping("/buscar")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UsuarioResponseDTO>> buscarUsuariosPorNombre(@RequestParam String nombre) {
-    	List<UsuarioResponseDTO> usuarios = usuarioServices.buscarUsuariosPorNombre(nombre);
-        return ResponseEntity.ok(usuarios);
+        return ResponseEntity.ok(usuarioServices.buscarUsuariosPorNombre(nombre));
     }
 
-    // Registrar Usuario
+    // 4. Registrar: El registro suele ser PÚBLICO (para que nuevos clientes entren)
+    // Pero si quieres que solo lo haga alguien logueado, déjalo así:
     @PostMapping("/registro")
+    @PreAuthorize("permitAll()") // Normalmente permitAll para que la gente se pueda apuntar al taller
     public ResponseEntity<UsuarioResponseDTO> registrar(@RequestBody UsuarioRegistroRequestDTO request) {
-        UsuarioResponseDTO usuario = usuarioServices.registrar(request);
-        return ResponseEntity.ok(usuario);
+        return ResponseEntity.ok(usuarioServices.registrar(request));
     }
 
-    // Modificar Usuario
+    // 5. Modificar Usuario: ¡AQUÍ FALTABA SEGURIDAD!
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> modificarUsuario( @PathVariable int id, @RequestBody UsuarioUpdateRequestDTO request) {
+    @PreAuthorize("hasRole('ADMIN') or @usuarioServices.esElMismoUsuario(#id, authentication.name)")
+    public ResponseEntity<UsuarioResponseDTO> modificarUsuario(@PathVariable int id, @RequestBody UsuarioUpdateRequestDTO request) {
         return ResponseEntity.ok(usuarioServices.modificarUsuario(id, request));
     }
 
-    // --- ENDPOINT PARA CAMBIAR CONTRASEÑA ---
+    // 6. Cambiar Contraseña: Solo el ADMIN o el DUEÑO
     @PatchMapping("/{id}/contrasena")
+    @PreAuthorize("hasRole('ADMIN') or @usuarioServices.esElMismoUsuario(#id, authentication.name)")
     public ResponseEntity<String> cambiarContrasena(@PathVariable int id, @RequestBody UsuarioContrasenaRequestDTO request) {
         usuarioServices.cambiarContrasena(id, request);
         return ResponseEntity.ok("Contraseña actualizada con éxito");
     }
     
-    //Iniciar sesion
+    // 7. Login: Debe ser público para poder entrar
     @PostMapping("/login")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<UsuarioResponseDTO> login(@RequestBody UsuarioLoginRequestDTO login) {
-    	UsuarioResponseDTO usuario = usuarioServices.login(login.getEmail(),login.getContrasena());
-        return ResponseEntity.ok(usuario);
+        return ResponseEntity.ok(usuarioServices.login(login.getEmail(), login.getContrasena()));
     }
-    
 
-    // Eliminar Usuario
+    // 8. Eliminar: Solo el ADMIN
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> eliminarUsuario(@PathVariable int id) {
-    	usuarioServices.eliminarUsuario(id);
+        usuarioServices.eliminarUsuario(id);
         return ResponseEntity.ok("Usuario eliminado correctamente");
     }
 }

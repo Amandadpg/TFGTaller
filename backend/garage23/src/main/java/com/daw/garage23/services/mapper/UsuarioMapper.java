@@ -35,6 +35,7 @@ public class UsuarioMapper {
 	    dto.setNombre(usuario.getNombre());
 	    dto.setApellidos(usuario.getApellidos());
 	    dto.setEmail(usuario.getEmail());
+	    dto.setDni(usuario.getDni());
 	    dto.setTelefono(usuario.getTelefono());
 	    dto.setRol(usuario.getRol() != null ? usuario.getRol().name() : "CLIENTE");
 

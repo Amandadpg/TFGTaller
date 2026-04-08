@@ -122,6 +122,13 @@ public class VehiculoServices {
 
         vehiculoRepository.delete(vehiculo);
     }
+    
+
+    public boolean esDuenioDelVehiculo(int vehiculoId, String emailAutenticado) {
+        return vehiculoRepository.findById(vehiculoId)
+                .map(v -> v.getUsuario().getEmail().equals(emailAutenticado))
+                .orElse(false);
+    }
 
 
     

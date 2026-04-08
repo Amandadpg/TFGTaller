@@ -2,13 +2,14 @@ package com.daw.garage23.web.config;
 
 import java.util.Arrays;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,6 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 	
 	@Value("${frontend.url}")
@@ -37,24 +39,18 @@ public class SecurityConfig {
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
-                // 1. RUTAS LIBRES (Login y Registro)
-                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
+			    
+			    .requestMatchers("/usuarios/login", "/usuarios/registro").permitAll() 
+			    .requestMatchers("/auth/**").permitAll() 
 
-                // 2. RUTAS DE TU TALLER (Adaptadas de las 'tareas' de tu profe)
-                // Permitimos que ADMIN y CLIENTE vean/gestionen sus cosas
-                .requestMatchers("/citas/**").hasAnyRole("ADMIN", "CLIENTE")
-                .requestMatchers("/vehiculos/**").hasAnyRole("ADMIN", "CLIENTE")
-                
-                // Los servicios quizás quieras que cualquiera los pueda ver (GET)
-                .requestMatchers(HttpMethod.GET, "/servicios/**").permitAll()
-                // Pero solo el ADMIN puede crearlos o borrarlos
-                .requestMatchers("/servicios/**").hasRole("ADMIN")
-
-                // 3. CUALQUIER OTRA PETICIÓN: Debe estar autenticado
-                .anyRequest().authenticated()
-			)
+			    
+			    .requestMatchers("/citas/**").hasAnyRole("ADMIN", "CLIENTE")
+			    .requestMatchers("/vehiculos/**").hasAnyRole("ADMIN", "CLIENTE")
+			    .requestMatchers("/servicios/**").hasAnyRole("ADMIN", "CLIENTE")
+			    
+			    
+			    .anyRequest().authenticated()
+			) 
 			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 			
 		return http.build();
@@ -68,6 +64,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        
         List<String> allowedOrigins = Arrays.stream(frontendUrls.split(","))
                                             .map(String::trim)
                                             .toList();

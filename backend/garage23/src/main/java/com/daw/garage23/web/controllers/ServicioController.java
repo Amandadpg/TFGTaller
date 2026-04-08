@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ public class ServicioController {
 	// Admin y usuario
     // Listar todos los servicios
     @GetMapping("/")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     public ResponseEntity<List<ServicioResponseDTO>> listarServicios() {
         return ResponseEntity.ok(servicioServices.listarTodosServicios());
     }
@@ -35,6 +37,7 @@ public class ServicioController {
     // Admin
     // Añadir servicio
     @PostMapping("/")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ServicioResponseDTO> crearServicio(@RequestBody ServicioRequestDTO request) {
         return ResponseEntity.ok(servicioServices.añadirServicio(request));
     }
@@ -42,6 +45,7 @@ public class ServicioController {
     // Admin
     // Modificar servicio
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ServicioResponseDTO> actualizarServicio(
             @PathVariable int id, 
             @RequestBody ServicioRequestDTO request) {
@@ -51,6 +55,7 @@ public class ServicioController {
     // Admin
     // Eliminar servicio
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> eliminarServicio(@PathVariable int id) {
         servicioServices.eliminarServicio(id);
         return ResponseEntity.ok("Servicio eliminado correctamente");
@@ -59,6 +64,7 @@ public class ServicioController {
     // Admin y usuario
     // Buscar servicio por nombre
     @GetMapping("/buscar")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     public ResponseEntity<List<ServicioResponseDTO>> buscarPorNombre(@RequestParam String nombre) {
         return ResponseEntity.ok(servicioServices.buscarServiciosPorNombre(nombre));
     }

@@ -1,5 +1,6 @@
 package com.daw.garage23.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,7 @@ public class CitaServices {
 
     @Autowired
     private ServicioServices servicioServices;
+    
 
     public List<CitaResponseDTO> listarTodas() {
         return CitaMapper.toDTOList(citaRepository.findAll());
@@ -92,31 +94,57 @@ public class CitaServices {
     }
     
     @Transactional
-    public CitaResponseDTO modificarCita(int idCita, CitaRequestDTO dto) {
-        // 1. Buscamos la cita actual
-        Cita cita = citaRepository.findById(idCita)
+    public CitaResponseDTO modificarCitaAdmin(int id, CitaRequestDTO dto) {
+        // 1. Buscamos la cita (sin filtros de tiempo, el admin es el jefe)
+        Cita cita = citaRepository.findById(id)
                 .orElseThrow(() -> new CitaNotFoundException("La cita no existe."));
 
-        // 2. REGLA DE NEGOCIO: No dejar modificar citas que ya terminaron o se cancelaron
-        if (cita.getEstado() != Estado.PENDIENTE) {
-            throw new CitaException("No se puede modificar una cita que ya está " + cita.getEstado());
-        }
-
-        // 3. Validar y obtener el nuevo Vehículo (usando su servicio)
+        // 2. Validamos el nuevo Vehículo y Servicio (usando los otros services)
         Vehiculo vehiculo = vehiculoServices.buscarEntidadPorId(dto.getVehiculoId());
-        
-        // 4. Validar y obtener el nuevo Servicio (usando su servicio)
         Servicio servicio = servicioServices.buscarEntidadPorId(dto.getServicioId());
 
-        // 5. Actualizar los datos de la entidad
+        // 3. Aplicamos todos los cambios del DTO
         cita.setFecha(dto.getFecha());
+        cita.setHora(dto.getHora());
         cita.setVehiculo(vehiculo);
         cita.setServicio(servicio);
-        // El estado lo dejamos como estaba (PENDIENTE) o podrías resetearlo si quieres
+        
+        // Opcional: Si el DTO trae un estado, también lo actualizamos
+        // cita.setEstado(dto.getEstado()); 
 
-        // 6. Guardar y devolver el DTO de respuesta
+        // 4. Guardar y mapear (usando tu estilo estático)
         Cita guardada = citaRepository.save(cita);
         return CitaMapper.toDTO(guardada);
+    }
+    
+    @Transactional // Es buena práctica añadirlo cuando modificas BD
+    public CitaResponseDTO modificarCitaCliente(int id, CitaRequestDTO dto) {
+        // 1. Buscar la cita (He cambiado Long por int porque tu repositorio usa int)
+        Cita cita = citaRepository.findById(id)
+                .orElseThrow(() -> new CitaNotFoundException("Cita no encontrada con ID: " + id));
+
+        // 2. Lógica de las 24 horas
+        LocalDateTime ahora = LocalDateTime.now();
+        LocalDateTime fechaCita = LocalDateTime.of(cita.getFecha(), cita.getHora());
+
+        if (ahora.isAfter(fechaCita.minusHours(24))) {
+            throw new CitaException("No puedes modificar; faltan menos de 24h para la cita.");
+        }
+
+        // 3. Lógica del estado
+        if (cita.getEstado() != Estado.PENDIENTE) {
+            throw new CitaException("Solo se pueden modificar citas en estado PENDIENTE.");
+        }
+
+        // 4. Actualizar datos (Fecha y Hora)
+        cita.setFecha(dto.getFecha());
+        cita.setHora(dto.getHora());
+        
+        // 5. Guardar
+        Cita citaGuardada = citaRepository.save(cita);
+
+        // 6. El Mapper: Usamos el mismo estilo que en tus otros métodos (CitaMapper.toDTO)
+        return CitaMapper.toDTO(citaGuardada); 
     }
     
     @Transactional
@@ -128,5 +156,14 @@ public class CitaServices {
 
         // 2. Borramos
         citaRepository.deleteById(idCita);
+    }
+    
+    public boolean esDuenioDeLaCita(int idCita, String emailUsuarioLogueado) {
+        Cita cita = citaRepository.findById(idCita).orElse(null);
+        if (cita == null) return false;
+        
+        // Comprobamos si el email del dueño del vehículo de la cita 
+        // coincide con el email del token JWT
+        return cita.getVehiculo().getUsuario().getEmail().equals(emailUsuarioLogueado);
     }
 }
