@@ -63,10 +63,10 @@ public class Usuario {
 	@Enumerated(value = EnumType.STRING)
 	private Rol rol;
 	
-	@OneToMany(mappedBy = "usuario",cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)
-	@JsonManagedReference
-	private List<Vehiculo> vehiculo = new ArrayList<>();
-	
+	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Vehiculo> vehiculos = new ArrayList<>();
+
 
 
 

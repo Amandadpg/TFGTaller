@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
     <aside class="w-64 bg-black text-white flex flex-col h-full shadow-2xl transition-all duration-300 border-r border-gray-900">
       <div class="h-20 flex items-center justify-center border-b border-gray-900">
         <h1 class="text-2xl font-black tracking-widest text-primary drop-shadow-[0_0_10px_#E820BB] flex items-center gap-2 uppercase">
-          Garage23
+          GARAGE23AMG
         </h1>
       </div>
       

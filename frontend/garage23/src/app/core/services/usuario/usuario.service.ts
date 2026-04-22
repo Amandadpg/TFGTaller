@@ -30,10 +30,15 @@ export class UsuarioService {
   }
 
   cambiarContrasena(id: number, contrasenaData: any): Observable<any> {
-    return this.api.put<any>(`/usuarios/${id}/contrasena`, contrasenaData); // Using PUT since ApiService only has PUT/POST/DELETE/GET mappings right now. I should add patch to apiService ideally, but I can bypass or we just use what we have. Actually the controller uses PatchMapping!
+    return this.api.patch<any>(`/usuarios/${id}/contrasena`, contrasenaData);
   }
 
   eliminarUsuario(id: number): Observable<string> {
     return this.api.delete<string>(`/usuarios/${id}`);
   }
+
+  obtenerUsuarioPorId(id: number): Observable<Usuario> {
+    return this.api.get<Usuario>(`/usuarios/${id}`);
+  }
+
 }

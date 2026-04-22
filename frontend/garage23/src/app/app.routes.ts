@@ -29,6 +29,11 @@ export const routes: Routes = [
     loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
   },
   {
+    path: 'registro',
+    canActivate: [postLoginRedirectGuard],
+    loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent)
+  },
+  {
     path: '',
     component: MainLayoutComponent,
     canActivate: [authGuard],

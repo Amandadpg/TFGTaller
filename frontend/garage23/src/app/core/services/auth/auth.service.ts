@@ -61,6 +61,10 @@ export class AuthService {
     return '/login';
   }
 
+  register(userData: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/registro`, userData);
+  }
+
   logout() {
     this.token.set(null);
     this.currentUser.set(null);

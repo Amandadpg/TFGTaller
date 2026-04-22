@@ -1,5 +1,9 @@
 package com.daw.garage23.services.dto.Vehiculos;
 
+import java.util.List;
+
+import com.daw.garage23.services.dto.Citas.CitaResponseDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,5 +22,6 @@ public class VehiculoResponseDTO {
     private String tipo;
     private int usuarioId;
     private String nombreDueno;
+    private List<CitaResponseDTO> citas;
     
 }

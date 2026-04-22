@@ -42,15 +42,36 @@ INSERT INTO `servicio` (`nombre_servicio`, `descripcion`, `precio`, `duracion_mi
 
 
 INSERT INTO `cita` (`fecha`, `hora`, `id_servicio`, `id_vehiculo`, `estado`) VALUES
-('2026-05-10', '09:00:00', 1, 13, 'PENDIENTE'),
-('2026-05-10', '11:30:00', 2, 13, 'PENDIENTE'),
-('2026-05-11', '10:00:00', 3, 14, 'COMPLETADA'),
-('2026-05-11', '12:00:00', 4, 15, 'PENDIENTE'),
-('2026-05-12', '08:30:00', 5, 16, 'CANCELADA'),
-('2026-05-12', '13:00:00', 6, 17, 'PENDIENTE'),
-('2026-05-13', '10:30:00', 7, 18, 'PENDIENTE'),
-('2026-05-13', '16:00:00', 8, 19, 'COMPLETADA'),
-('2026-05-14', '09:15:00', 9, 20, 'PENDIENTE'),
-('2026-05-14', '11:45:00', 10, 21, 'PENDIENTE'),
-('2026-05-15', '10:00:00', 11, 19, 'PENDIENTE'),
-('2026-05-15', '12:30:00', 12, 16, 'COMPLETADA');
+('2026-05-10', '09:00:00', 1, 1, 'PENDIENTE'),
+('2026-05-10', '11:30:00', 2, 1, 'PENDIENTE'),
+('2026-05-11', '10:00:00', 3, 2, 'COMPLETADA'),
+('2026-05-11', '12:00:00', 4, 3, 'PENDIENTE'),
+('2026-05-12', '08:30:00', 5, 4, 'CANCELADA'),
+('2026-05-12', '13:00:00', 6, 4, 'PENDIENTE'),
+('2026-05-13', '10:30:00', 7, 5, 'PENDIENTE'),
+('2026-05-13', '16:00:00', 8, 6, 'COMPLETADA'),
+('2026-05-14', '09:15:00', 9, 7, 'PENDIENTE'),
+('2026-05-14', '11:45:00', 10, 8, 'PENDIENTE'),
+('2026-05-15', '10:00:00', 11, 9, 'PENDIENTE'),
+('2026-05-15', '12:30:00', 12, 9, 'COMPLETADA');
+
+
+-- Creamos un usuario de prueba si no existe
+INSERT INTO usuario (nombre, apellidos, email, contrasena, dni, rol) 
+VALUES ('Fernando', 'Alonso', 'magic@nana.com', '1234', '14141414A', 'CLIENTE');
+
+-- Creamos su coche (asumiendo que el ID del usuario anterior es el que corresponda, ej: 14)
+-- Ajusta el id_usuario según lo que veas en tu tabla de usuarios
+INSERT INTO vehiculo (marca, modelo, matricula, id_usuario) 
+VALUES ('Aston Martin', 'AMR23', '0014-FA', (SELECT id FROM usuario WHERE dni = '14141414A'));
+-- Cita para HOY (8 de Abril)
+INSERT INTO cita (fecha, hora, id_servicio, id_vehiculo, estado) 
+VALUES (CURDATE(), '10:30:00', 1, (SELECT id FROM vehiculo WHERE matricula = '0014-FA'), 'PENDIENTE');
+
+-- Cita para MAÑANA (9 de Abril)
+INSERT INTO cita (fecha, hora, id_servicio, id_vehiculo, estado) 
+VALUES (DATE_ADD(CURDATE(), INTERVAL 1 DAY), '12:00:00', 2, (SELECT id FROM vehiculo WHERE matricula = '0014-FA'), 'PENDIENTE');
+
+-- Cita para PASADO MAÑANA (10 de Abril)
+INSERT INTO cita (fecha, hora, id_servicio, id_vehiculo, estado) 
+VALUES (DATE_ADD(CURDATE(), INTERVAL 2 DAY), '16:00:00', 1, (SELECT id FROM vehiculo WHERE matricula = '0014-FA'), 'PENDIENTE');

@@ -15,4 +15,6 @@ public class UsuarioUpdateRequestDTO {
     private String dni;
     private String telefono;
     private String direccion;
+    private String rol; // Opcional - admin puede cambiar el rol
 }
+

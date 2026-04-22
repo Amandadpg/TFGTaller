@@ -5,4 +5,5 @@ export interface Cita {
   estado: 'PENDIENTE' | 'COMPLETADA' | 'CANCELADA';
   matriculaVehiculo: string;
   nombreServicio: string;
+  nombreUsuario?: string;
 }

@@ -3,13 +3,15 @@ package com.daw.garage23.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.daw.garage23.persistence.entities.Cita;
 import com.daw.garage23.persistence.entities.Usuario;
+import com.daw.garage23.persistence.entities.Vehiculo;
+import com.daw.garage23.persistence.entities.enums.Rol;
 import com.daw.garage23.persistence.repositories.UsuarioRepository;
 import com.daw.garage23.services.dto.Usuarios.UsuarioContrasenaRequestDTO;
 import com.daw.garage23.services.dto.Usuarios.UsuarioRegistroRequestDTO;
@@ -18,6 +20,8 @@ import com.daw.garage23.services.dto.Usuarios.UsuarioUpdateRequestDTO;
 import com.daw.garage23.services.exceptions.Usuario.UsuarioException;
 import com.daw.garage23.services.exceptions.Usuario.UsuarioNotFoundException;
 import com.daw.garage23.services.mapper.UsuarioMapper;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UsuarioServices implements UserDetailsService{
@@ -38,11 +42,14 @@ public class UsuarioServices implements UserDetailsService{
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    
+    @Autowired
+    private UsuarioMapper usuarioMapper;
 
     // Solo admin
     public List<UsuarioResponseDTO> listarTodosUsuarios() {
         List<Usuario> usuarios = usuarioRepository.findAll();
-        return UsuarioMapper.toResponseDTOList(usuarios);
+        return usuarioMapper.toResponseDTOList(usuarios); // <--- CAMBIADO
     }
     
     public Usuario buscarEntidadPorId(int id) {
@@ -52,33 +59,25 @@ public class UsuarioServices implements UserDetailsService{
 
     // Solo admin
     public UsuarioResponseDTO obtenerUsuarioPorId(int id) {
-
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() ->
-                        new UsuarioNotFoundException("El usuario con id " + id + " no se ha encontrado."));
-
-        return UsuarioMapper.toResponseDTO(usuario);
+        Usuario usuario = buscarEntidadPorId(id);
+        return usuarioMapper.toResponseDTO(usuario); // <--- CAMBIADO
     }
 
     // Admin
     public List<UsuarioResponseDTO> buscarUsuariosPorNombre(String nombre) {
-
         List<Usuario> usuarios = usuarioRepository.findByNombreContainingIgnoreCase(nombre);
-
         if (usuarios.isEmpty()) {
             throw new UsuarioException("No se encontraron usuarios con nombre que contenga: " + nombre);
         }
-
-        return UsuarioMapper.toResponseDTOList(usuarios);
+        return usuarioMapper.toResponseDTOList(usuarios); // <--- Corregido método y minúscula
     }
 
     // Cliente y admin
     public UsuarioResponseDTO registrar(UsuarioRegistroRequestDTO request) {
-
-    	if (request.getContrasena() == null || !request.getContrasena().equals(request.getConfirmarContrasena())) {
+        if (request.getContrasena() == null || !request.getContrasena().equals(request.getConfirmarContrasena())) {
             throw new UsuarioException("Las contraseñas no coinciden. Por favor, verifícalas.");
         }
-    	
+        
         if (usuarioRepository.existsByEmail(request.getEmail())) {
             throw new UsuarioException("Ya existe un usuario con ese email");
         }
@@ -87,16 +86,24 @@ public class UsuarioServices implements UserDetailsService{
             throw new UsuarioException("Ya existe un usuario registrado con el DNI: " + request.getDni());
         }
 
-        Usuario usuario = UsuarioMapper.fromRegistroDTO(request);
+        // Primero creamos la entidad con el mapper
+        Usuario usuario = usuarioMapper.fromRegistroDTO(request); // <--- Minúscula
+
+        // Ahora aplicamos el Rol si viene en el request
+        if (request.getRol() != null && !request.getRol().isBlank()) {
+            try {
+                usuario.setRol(Rol.valueOf(request.getRol().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new UsuarioException("Rol no válido: " + request.getRol());
+            }
+        }
 
         Usuario guardado = usuarioRepository.save(usuario);
-
-        return UsuarioMapper.toResponseDTO(guardado);
+        return usuarioMapper.toResponseDTO(guardado); // <--- Minúscula
     }
 
     // Cliente y admin
     public UsuarioResponseDTO login(String email, String contrasena) {
-
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
 
@@ -104,7 +111,7 @@ public class UsuarioServices implements UserDetailsService{
             throw new UsuarioException("Contraseña incorrecta");
         }
 
-        return UsuarioMapper.toResponseDTO(usuario);
+        return usuarioMapper.toResponseDTO(usuario); // <--- Minúscula
     }
 
     // Cliente y admin
@@ -113,7 +120,6 @@ public class UsuarioServices implements UserDetailsService{
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
 
-        // Validaciones de negocio
         if (usuarioRepository.existsByEmailAndIdNot(dto.getEmail(), id)) {
             throw new UsuarioException("El email ya está en uso");
         }
@@ -122,11 +128,19 @@ public class UsuarioServices implements UserDetailsService{
             throw new UsuarioException("El DNI ya está en uso");
         }
 
-        // Usamos el mapper para actualizar solo los campos permitidos
-        UsuarioMapper.updateEntityFromDTO(dto, usuarioExistente);
+        // Usamos la variable inyectada para actualizar
+        usuarioMapper.updateEntityFromDTO(dto, usuarioExistente); // <--- Minúscula
+
+        if (dto.getRol() != null && !dto.getRol().isBlank()) {
+            try {
+                usuarioExistente.setRol(Rol.valueOf(dto.getRol().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new UsuarioException("Rol no válido: " + dto.getRol());
+            }
+        }
 
         Usuario actualizado = usuarioRepository.save(usuarioExistente);
-        return UsuarioMapper.toResponseDTO(actualizado);
+        return usuarioMapper.toResponseDTO(actualizado); // <--- Minúscula
     }
 
     
@@ -155,12 +169,27 @@ public class UsuarioServices implements UserDetailsService{
 
     // Admin
     // Eliminar usuario
+    @Transactional
     public void eliminarUsuario(int id) {
-
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() ->
-                        new UsuarioNotFoundException("El usuario con id " + id + " no se ha encontrado."));
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
 
+        // 1. Recorremos sus vehículos (Relación USUARIO -> VEHICULO de tu dibujo)
+        if (usuario.getVehiculos() != null) {
+            for (Vehiculo v : usuario.getVehiculos()) {
+                
+                // 2. Recorremos las citas de cada vehículo (Relación VEHICULO -> CITA)
+                if (v.getCitas() != null) {
+                    for (Cita cita : v.getCitas()) {
+                        cita.setVehiculo(null); // La soltamos para poder borrar
+                        cita.setEstado(com.daw.garage23.persistence.entities.enums.Estado.CANCELADA);
+                    }
+                    v.getCitas().clear();
+                }
+            }
+        }
+
+        // 3. Al borrar el usuario, se borrarán sus vehículos por CascadeType.ALL
         usuarioRepository.delete(usuario);
     }
 

@@ -17,5 +17,6 @@ public class UsuarioRegistroRequestDTO {
     private String direccion;
     private String contrasena;
     private String confirmarContrasena;
+    private String rol; // Opcional - usado por admin para asignar rol al crear
 	
 }

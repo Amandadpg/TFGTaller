@@ -1,10 +1,11 @@
 package com.daw.garage23.persistence.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.daw.garage23.persistence.entities.enums.Tipo;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -51,7 +52,7 @@ public class Vehiculo {
 	@JsonBackReference
 	private Usuario usuario;
 	
-	@OneToMany(mappedBy = "vehiculo", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<Cita> cita;
+	@OneToMany(mappedBy = "vehiculo", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER) // <--- Añade esto
+	@JsonManagedReference
+	private List<Cita> citas = new ArrayList<>();
 }

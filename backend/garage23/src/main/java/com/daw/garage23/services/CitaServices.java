@@ -32,37 +32,30 @@ public class CitaServices {
     @Autowired
     private ServicioServices servicioServices;
     
-
+    @Autowired
+    private CitaMapper citaMapper;
+    
     public List<CitaResponseDTO> listarTodas() {
-        return CitaMapper.toDTOList(citaRepository.findAll());
+        return citaMapper.toDTOList(citaRepository.findAll()); // <--- CAMBIADO
     }
     
     public CitaResponseDTO buscarPorId(int id) {
-        // 1. Buscamos la entidad en la base de datos
         Cita cita = citaRepository.findById(id)
                 .orElseThrow(() -> new CitaNotFoundException("No se encontró la cita con ID: " + id));
-
-        // 2. La convertimos a DTO usando tu Mapper para devolver los datos bonitos
-        return CitaMapper.toDTO(cita);
+        return citaMapper.toResponseDTO(cita); // <--- CAMBIADO
     }
     
     public List<CitaResponseDTO> buscarCitasPorNombreUsuario(String nombre) {
-        // 1. Buscamos en el repositorio
         List<Cita> citas = citaRepository.findByVehiculoUsuarioNombreContainingIgnoreCase(nombre);
-        
-        // 2. Si no hay ninguna, podemos devolver una lista vacía o lanzar una excepción
         if (citas.isEmpty()) {
             throw new CitaNotFoundException("No hay citas para el usuario: " + nombre);
         }
-
-        // 3. Mapeamos la lista de entidades a lista de DTOs
         return citas.stream()
-                    .map(CitaMapper::toDTO)
+                    .map(c -> citaMapper.toResponseDTO(c)) // <--- CAMBIADO
                     .collect(Collectors.toList());
     }
 
     public CitaResponseDTO reservar(CitaRequestDTO dto) {
-        // CAMBIO: Usamos los servicios para buscar las entidades
         Vehiculo vehiculo = vehiculoServices.buscarEntidadPorId(dto.getVehiculoId());
         Servicio servicio = servicioServices.buscarEntidadPorId(dto.getServicioId());
 
@@ -73,7 +66,7 @@ public class CitaServices {
         cita.setVehiculo(vehiculo);
         cita.setServicio(servicio);
 
-        return CitaMapper.toDTO(citaRepository.save(cita));
+        return citaMapper.toResponseDTO(citaRepository.save(cita)); // <--- CAMBIADO
     }
 
     @Transactional
@@ -89,8 +82,7 @@ public class CitaServices {
         // Actualizamos el estado
         cita.setEstado(nuevoEstado);
         
-        Cita guardada = citaRepository.save(cita);
-        return CitaMapper.toDTO(guardada);
+        return citaMapper.toResponseDTO(citaRepository.save(cita));
     }
     
     @Transactional
@@ -99,22 +91,25 @@ public class CitaServices {
         Cita cita = citaRepository.findById(id)
                 .orElseThrow(() -> new CitaNotFoundException("La cita no existe."));
 
-        // 2. Validamos el nuevo Vehículo y Servicio (usando los otros services)
-        Vehiculo vehiculo = vehiculoServices.buscarEntidadPorId(dto.getVehiculoId());
-        Servicio servicio = servicioServices.buscarEntidadPorId(dto.getServicioId());
+        // 2. Validamos el nuevo Vehículo y Servicio si se envían en el DTO
+        if (dto.getVehiculoId() > 0) {
+            Vehiculo vehiculo = vehiculoServices.buscarEntidadPorId(dto.getVehiculoId());
+            cita.setVehiculo(vehiculo);
+        }
+        if (dto.getServicioId() > 0) {
+            Servicio servicio = servicioServices.buscarEntidadPorId(dto.getServicioId());
+            cita.setServicio(servicio);
+        }
 
-        // 3. Aplicamos todos los cambios del DTO
-        cita.setFecha(dto.getFecha());
-        cita.setHora(dto.getHora());
-        cita.setVehiculo(vehiculo);
-        cita.setServicio(servicio);
+        // 3. Aplicamos cambios básicos
+        if (dto.getFecha() != null) cita.setFecha(dto.getFecha());
+        if (dto.getHora() != null) cita.setHora(dto.getHora());
         
         // Opcional: Si el DTO trae un estado, también lo actualizamos
         // cita.setEstado(dto.getEstado()); 
 
         // 4. Guardar y mapear (usando tu estilo estático)
-        Cita guardada = citaRepository.save(cita);
-        return CitaMapper.toDTO(guardada);
+        return citaMapper.toResponseDTO(citaRepository.save(cita));
     }
     
     @Transactional // Es buena práctica añadirlo cuando modificas BD
@@ -140,11 +135,7 @@ public class CitaServices {
         cita.setFecha(dto.getFecha());
         cita.setHora(dto.getHora());
         
-        // 5. Guardar
-        Cita citaGuardada = citaRepository.save(cita);
-
-        // 6. El Mapper: Usamos el mismo estilo que en tus otros métodos (CitaMapper.toDTO)
-        return CitaMapper.toDTO(citaGuardada); 
+        return citaMapper.toResponseDTO(citaRepository.save(cita));
     }
     
     @Transactional

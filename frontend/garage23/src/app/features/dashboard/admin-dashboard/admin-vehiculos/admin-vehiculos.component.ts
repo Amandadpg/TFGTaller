@@ -12,7 +12,7 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
   template: `
     <div class="p-8">
       <div class="flex justify-between items-center mb-8">
-        <h2 class="text-2xl font-bold text-brand-light flex items-center gap-3">
+        <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-3">
           <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
           Gestión de Todos los Vehículos
         </h2>
@@ -22,17 +22,24 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
       </div>
 
       <!-- Buscador -->
-      <div class="mb-6 flex gap-4">
-        <input type="text" #buscadorMatricula placeholder="Buscar por matrícula..." class="flex-1 bg-brand-anthracite border border-gray-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 outline-none uppercase">
-        <button (click)="buscarPorMatricula(buscadorMatricula.value)" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors border border-gray-700">Buscar</button>
-        <button (click)="cargarVehiculos()" class="bg-gray-800 hover:bg-gray-700 text-brand-muted hover:text-white font-bold py-3 px-4 rounded-lg transition-colors border border-gray-700" title="Ver Todos">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-        </button>
+      <div class="mb-6 flex flex-col md:flex-row gap-4">
+        <div class="flex-1 flex gap-2 shadow-sm rounded-lg">
+          <select #tipoBusqueda class="bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-primary focus:ring-1 outline-none font-medium">
+            <option value="matricula">Matrícula</option>
+            <option value="marca">Marca</option>
+          </select>
+          <input type="text" #buscador placeholder="Término de búsqueda..." class="flex-1 bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-1 outline-none uppercase font-medium">
+        </div>
+        <div class="flex gap-2">
+          <button (click)="buscarVehiculos(tipoBusqueda.value, buscador.value)" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors border border-gray-700">Buscar</button>
+          <button (click)="cargarVehiculos()" class="bg-gray-800 hover:bg-gray-700 text-brand-muted hover:text-white font-bold py-3 px-4 rounded-lg transition-colors border border-gray-700" title="Ver Todos">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+        </div>
       </div>
-
       <!-- Formulario -->
       <div *ngIf="mostrarFormulario" class="bg-brand-anthracite rounded-2xl shadow-xl border border-gray-800 p-6 mb-8">
-        <h3 class="text-xl font-bold text-white mb-4">{{ vehiculoEditando ? 'Editar Vehículo' : 'Añadir Vehículo (Sin vincular a usuario)' }}</h3>
+        <h3 class="text-xl font-bold text-white mb-4">{{ vehiculoEditando ? 'Editar Vehículo' : 'Añadir Vehículo al Taller' }}</h3>
         <form [formGroup]="vehiculoForm" (ngSubmit)="guardarVehiculo()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label class="block text-brand-muted text-sm mb-1">Matrícula</label>
@@ -45,6 +52,10 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
           <div>
             <label class="block text-brand-muted text-sm mb-1">Modelo</label>
             <input formControlName="modelo" class="w-full bg-brand-dark border border-gray-700 rounded-lg px-3 py-2 text-white outline-none focus:border-primary">
+          </div>
+          <div>
+            <label class="block text-brand-muted text-sm mb-1">DNI Propietario</label>
+            <input formControlName="dniCliente" class="w-full bg-brand-dark border border-gray-700 rounded-lg px-3 py-2 text-white outline-none focus:border-primary uppercase" placeholder="12345678A">
           </div>
           <div>
             <label class="block text-brand-muted text-sm mb-1">Tipo</label>
@@ -113,7 +124,8 @@ export class AdminVehiculosComponent implements OnInit {
     matricula: ['', Validators.required],
     marca: ['', Validators.required],
     modelo: ['', Validators.required],
-    tipo: ['COCHE', Validators.required]
+    tipo: ['COCHE', Validators.required],
+    dniCliente: ['', [Validators.required, Validators.maxLength(10)]]
   });
 
   ngOnInit() {
@@ -134,28 +146,43 @@ export class AdminVehiculosComponent implements OnInit {
     });
   }
 
-  buscarPorMatricula(mat: string) {
-    if (!mat) {
+  buscarVehiculos(tipo: string, termino: string) {
+    if (!termino) {
       this.cargarVehiculos();
       return;
     }
     this.isLoading = true;
-    this.vehiculoService.buscarVehiculosPorMatricula(mat).subscribe({
-      next: (data) => {
-        this.vehiculos = data;
-        this.isLoading = false;
-      },
-      error: () => {
-        this.toastService.show('Error en búsqueda', 'error');
-        this.isLoading = false;
-      }
-    });
+
+    if (tipo === 'matricula') {
+      this.vehiculoService.buscarVehiculosPorMatricula(termino).subscribe({
+        next: (data) => {
+          this.vehiculos = data;
+          this.isLoading = false;
+        },
+        error: () => {
+          this.toastService.show('Error en búsqueda por matrícula', 'error');
+          this.isLoading = false;
+        }
+      });
+    } else {
+      this.vehiculoService.buscarVehiculosPorMarca(termino).subscribe({
+        next: (data) => {
+          this.vehiculos = data;
+          this.isLoading = false;
+        },
+        error: () => {
+          this.toastService.show('Error en búsqueda por marca', 'error');
+          this.isLoading = false;
+        }
+      });
+    }
   }
 
   mostrarFormularioNuevo() {
     this.vehiculoEditando = null;
     this.vehiculoForm.reset({ tipo: 'COCHE' });
     this.mostrarFormulario = true;
+    window.scrollTo(0, 0);
   }
 
   editarVehiculo(vehiculo: Vehiculo) {
@@ -164,9 +191,11 @@ export class AdminVehiculosComponent implements OnInit {
       matricula: vehiculo.matricula,
       marca: vehiculo.marca,
       modelo: vehiculo.modelo,
-      tipo: vehiculo.tipo
+      tipo: vehiculo.tipo,
+      dniCliente: '' // El DNI no viene en Vehiculo, debe volver a introducir el de quien se quiere vincular
     });
     this.mostrarFormulario = true;
+    window.scrollTo(0, 0);
   }
 
   cancelarFormulario() {

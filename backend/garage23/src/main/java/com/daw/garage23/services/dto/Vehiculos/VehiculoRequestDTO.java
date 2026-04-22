@@ -15,5 +15,5 @@ public class VehiculoRequestDTO {
     private String marca;
     private String modelo;
     private Tipo tipo;
-    private Integer usuarioId;
+    private String dniCliente;
 }

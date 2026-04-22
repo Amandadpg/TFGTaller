@@ -12,7 +12,7 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
   template: `
     <div class="p-8">
       <div class="flex justify-between items-center mb-8">
-        <h2 class="text-2xl font-bold text-brand-light flex items-center gap-3">
+        <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-3">
           <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           Gestión Global de Citas
         </h2>
@@ -20,7 +20,7 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
 
       <!-- Buscador -->
       <div class="mb-6 flex gap-4">
-        <input type="text" #buscador placeholder="Buscar citas por nombre de usuario..." class="flex-1 bg-brand-anthracite border border-gray-800 rounded-lg px-4 py-3 text-white outline-none focus:border-primary">
+        <input type="text" #buscador placeholder="Buscar citas por nombre de usuario..." class="flex-1 bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-1 outline-none shadow-sm font-medium">
         <button (click)="buscarPorNombre(buscador.value)" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors border border-gray-700">Buscar</button>
         <button (click)="cargarCitas()" class="bg-gray-800 hover:bg-gray-700 text-brand-muted hover:text-white font-bold py-3 px-4 rounded-lg transition-colors border border-gray-700" title="Ver Todas">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -85,7 +85,7 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
               </td>
               <td class="px-6 py-4 font-medium text-white">{{ c.nombreServicio }}</td>
               <td class="px-6 py-4 font-mono tracking-wider font-bold text-gray-300">{{ c.matriculaVehiculo }}</td>
-              <td class="px-6 py-4 text-brand-muted">{{ c['nombreUsuario'] || 'Cliente Desconocido' }}</td>
+              <td class="px-6 py-4 text-brand-muted">{{ c.nombreUsuario }}</td>
               <td class="px-6 py-4">
                 <span class="px-2 py-1 rounded text-xs font-bold" 
                   [ngClass]="{
@@ -114,7 +114,7 @@ export class AdminCitasComponent implements OnInit {
   private citaService = inject(CitaService);
   private toastService = inject(ToastService);
 
-  citas: (Cita & { nombreUsuario?: string })[] = [];
+  citas: Cita[] = [];
   isLoading = true;
   mostrarFormulario = false;
   citaEditando: Cita | null = null;
@@ -123,8 +123,8 @@ export class AdminCitasComponent implements OnInit {
     fecha: ['', Validators.required],
     hora: ['', Validators.required],
     estado: ['PENDIENTE', Validators.required],
-    matriculaVehiculo: [{value: '', disabled: true}, Validators.required], // We don't alter vehicule via Citas update
-    nombreServicio: [{value: '', disabled: true}, Validators.required] // Only show
+    matriculaVehiculo: [{ value: '', disabled: true }, Validators.required], // We don't alter vehicule via Citas update
+    nombreServicio: [{ value: '', disabled: true }, Validators.required] // Only show
   });
 
   ngOnInit() {
@@ -164,13 +164,13 @@ export class AdminCitasComponent implements OnInit {
   }
 
   cambiarEstado(id: number, nuevoEstado: string) {
-     this.citaService.cambiarEstado(id, nuevoEstado).subscribe({
-        next: () => {
-           this.toastService.show('Estado de la cita actualizado', 'success');
-           this.cargarCitas();
-        },
-        error: () => this.toastService.show('Error al cambiar el estado', 'error')
-     });
+    this.citaService.cambiarEstado(id, nuevoEstado).subscribe({
+      next: () => {
+        this.toastService.show('Estado de la cita actualizado', 'success');
+        this.cargarCitas();
+      },
+      error: () => this.toastService.show('Error al cambiar el estado', 'error')
+    });
   }
 
   editarCita(cita: Cita) {
@@ -183,6 +183,7 @@ export class AdminCitasComponent implements OnInit {
       nombreServicio: cita.nombreServicio
     });
     this.mostrarFormulario = true;
+    window.scrollTo(0, 0);
   }
 
   cancelarFormulario() {
@@ -202,23 +203,23 @@ export class AdminCitasComponent implements OnInit {
 
     // Primero si cambia estado
     if (formVals.estado !== this.citaEditando.estado) {
-       this.citaService.cambiarEstado(this.citaEditando.id, formVals.estado!).subscribe({
-          next: () => this.ejecutarModificacionAdmin(data)
-       });
+      this.citaService.cambiarEstado(this.citaEditando.id, formVals.estado!).subscribe({
+        next: () => this.ejecutarModificacionAdmin(data)
+      });
     } else {
-       this.ejecutarModificacionAdmin(data);
+      this.ejecutarModificacionAdmin(data);
     }
   }
 
   ejecutarModificacionAdmin(data: any) {
-     this.citaService.modificarAdmin(this.citaEditando!.id, data).subscribe({
-        next: () => {
-          this.toastService.show('Cita actualizada correctamente', 'success');
-          this.cargarCitas();
-          this.cancelarFormulario();
-        },
-        error: () => this.toastService.show('Error al actualizar los detalles de la cita', 'error')
-     });
+    this.citaService.modificarAdmin(this.citaEditando!.id, data).subscribe({
+      next: () => {
+        this.toastService.show('Cita actualizada correctamente', 'success');
+        this.cargarCitas();
+        this.cancelarFormulario();
+      },
+      error: () => this.toastService.show('Error al actualizar los detalles de la cita', 'error')
+    });
   }
 
   eliminarCita(id: number) {

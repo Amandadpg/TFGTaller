@@ -22,5 +22,7 @@ public interface UsuarioRepository extends ListCrudRepository<Usuario, Integer>{
     boolean existsByDni(String dni);
     
     List<Usuario> findByNombreContainingIgnoreCase(String nombre);
+    
+    Optional<Usuario> findByDni(String dni);
 	
 }
