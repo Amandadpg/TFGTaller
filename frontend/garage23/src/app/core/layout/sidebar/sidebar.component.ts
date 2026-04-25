@@ -60,12 +60,18 @@ import { CommonModule } from '@angular/common';
           </a>
         </ng-container>
       </nav>
-      
-      <div class="p-4 border-t border-gray-900 flex justify-center pb-8">
-        <button (click)="logout()" class="text-sm font-bold text-gray-500 hover:text-primary transition-colors flex items-center gap-2">
-          Cerrar Sesión
-        </button>
+      <div *ngIf="isAdmin()" class="p-6 border-t border-gray-900 mt-auto">
+        <div class="bg-primary/5 border border-primary/20 rounded-lg p-4 backdrop-blur-sm">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+            <p class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Panel de Control</p>
+          </div>
+          <p class="text-[11px] text-gray-400 leading-relaxed italic">
+            "Recuerda verificar las <b>citas pendientes</b> y actualizar servicios regularmente."
+          </p>
+        </div>
       </div>
+      
     </aside>
   `
 })
@@ -80,7 +86,4 @@ export class SidebarComponent {
     return this.authService.currentUser()?.rol === 'ADMIN';
   }
 
-  logout() {
-    this.authService.logout();
-  }
 }

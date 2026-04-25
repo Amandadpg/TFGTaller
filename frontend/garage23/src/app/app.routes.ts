@@ -38,29 +38,29 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     canActivate: [authGuard],
     children: [
-      { 
-        path: 'client-dashboard', 
-        loadComponent: () => import('./features/dashboard/client-dashboard/client-dashboard.component').then(c => c.ClientDashboardComponent) 
+      {
+        path: 'client-dashboard',
+        loadComponent: () => import('./features/dashboard/client-dashboard/client-dashboard.component').then(c => c.ClientDashboardComponent)
       },
-      { 
-        path: 'mi-perfil', 
-        loadComponent: () => import('./features/dashboard/client-dashboard/perfil/perfil.component').then(c => c.PerfilComponent) 
+      {
+        path: 'mi-perfil',
+        loadComponent: () => import('./features/dashboard/client-dashboard/perfil/perfil.component').then(c => c.PerfilComponent)
       },
-      { 
-        path: 'mis-vehiculos', 
-        loadComponent: () => import('./features/dashboard/client-dashboard/mis-vehiculos/mis-vehiculos.component').then(c => c.MisVehiculosComponent) 
+      {
+        path: 'mis-vehiculos',
+        loadComponent: () => import('./features/dashboard/client-dashboard/mis-vehiculos/mis-vehiculos.component').then(c => c.MisVehiculosComponent)
       },
-      { 
-        path: 'catalogo', 
-        loadComponent: () => import('./features/dashboard/client-dashboard/catalogo/catalogo.component').then(c => c.CatalogoComponent) 
+      {
+        path: 'catalogo',
+        loadComponent: () => import('./features/dashboard/client-dashboard/catalogo/catalogo.component').then(c => c.CatalogoComponent)
       },
-      { 
-        path: 'reservar', 
-        loadComponent: () => import('./features/dashboard/client-dashboard/reservar-cita/reservar-cita.component').then(c => c.ReservarCitaComponent) 
+      {
+        path: 'reservar',
+        loadComponent: () => import('./features/dashboard/client-dashboard/reservar-cita/reservar-cita.component').then(c => c.ReservarCitaComponent)
       },
-      { 
-        path: 'admin-dashboard', 
-        loadComponent: () => import('./features/dashboard/admin-dashboard/admin-dashboard.component').then(c => c.AdminDashboardComponent) 
+      {
+        path: 'admin-dashboard',
+        loadComponent: () => import('./features/dashboard/admin-dashboard/admin-vehiculos.component').then(c => c.AdminVehiculosComponent)
       },
       {
         path: 'admin-usuarios',

@@ -4,6 +4,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UsuarioService } from '../../../../core/services/usuario/usuario.service';
 import { Usuario } from '../../../../core/models/usuario.model';
 import { ToastService } from '../../../../core/services/toast/toast.service';
+import { VehiculoService } from '../../../../core/services/vehiculo/vehiculo.service';
+import { CitaService } from '../../../../core/services/cita/cita.service';
 
 @Component({
   selector: 'app-admin-usuarios',
@@ -21,6 +23,7 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
         </button>
       </div>
 
+      
       <div class="mb-6 flex gap-4">
         <input type="text" #buscadorNombre placeholder="Buscar usuario por nombre..." class="flex-1 bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:border-primary shadow-sm font-medium">
         <button (click)="buscarPorNombre(buscadorNombre.value)" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors border border-gray-700">Buscar</button>
@@ -107,6 +110,14 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
                   <p class="text-gray-500 text-[10px] uppercase font-bold mb-1">Email</p>
                   <p class="text-white font-medium">{{ usuarioSeleccionado.email }}</p>
                 </div>
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/5 lg:col-span-2">
+                  <p class="text-gray-500 text-[10px] uppercase font-bold mb-1">Dirección</p>
+                  <p class="text-white font-medium">{{ usuarioSeleccionado.direccion }}</p>
+                </div>
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/5 lg:col-span-2">
+                  <p class="text-gray-500 text-[10px] uppercase font-bold mb-1">Rol</p>
+                  <p class="text-white font-medium">{{ usuarioSeleccionado.rol }}</p>
+                </div>
               </div>
             </section>
 
@@ -121,26 +132,6 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
               <ng-template #noVehiculos><p class="text-gray-600 italic ml-1">No tiene vehículos registrados.</p></ng-template>
             </section>
 
-            <section>
-              <h4 class="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-4 ml-1">Historial de Citas</h4>
-              <div *ngIf="usuarioSeleccionado.citas?.length; else noCitas" class="overflow-hidden border border-white/5 rounded-2xl bg-white/5">
-                <table class="w-full text-left text-sm">
-                  <thead class="bg-white/5 text-gray-400 uppercase text-[10px] font-bold">
-                    <tr><th class="px-6 py-4">Fecha</th><th class="px-6 py-4">Estado</th><th class="px-6 py-4">Descripción</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let c of usuarioSeleccionado.citas" class="border-t border-white/5 hover:bg-white/5 transition-colors">
-                      <td class="px-6 py-4 text-white">{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
-                      <td class="px-6 py-4">
-                        <span class="px-2 py-1 rounded-md text-[10px] font-black bg-primary/20 text-primary uppercase">{{ c.estado }}</span>
-                      </td>
-                      <td class="px-6 py-4 text-gray-400">{{ c.descripcion }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <ng-template #noCitas><p class="text-gray-600 italic ml-1">No hay citas registradas.</p></ng-template>
-            </section>
           </div>
         </div>
       </div>
@@ -154,6 +145,8 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
 export class AdminUsuariosComponent implements OnInit {
   private fb = inject(FormBuilder);
   private usuarioService = inject(UsuarioService);
+  private vehiculoService = inject(VehiculoService); // <--- AÑADE ESTE
+  private citaService = inject(CitaService);
   private toastService = inject(ToastService);
 
   usuarios: Usuario[] = [];
@@ -208,10 +201,20 @@ export class AdminUsuariosComponent implements OnInit {
       next: (data) => {
         this.usuarios = data;
         this.isLoading = false;
+
+        // Si el backend devuelve 200 OK pero la lista está vacía
+        if (data.length === 0) {
+          this.toastService.show('No se ha encontrado ningún usuario con ese nombre', 'error');
+        }
       },
       error: () => {
-        this.toastService.show('Error al buscar usuarios', 'error');
+        // Vaciamos la tabla de resultados
+        this.usuarios = [];
         this.isLoading = false;
+
+        // ¡AQUÍ ESTÁ LA CLAVE! 
+        // Usamos toastService en lugar de alert() o SweetAlert
+        this.toastService.show('No se ha encontrado ningún usuario con ese nombre', 'error');
       }
     });
   }
@@ -275,14 +278,74 @@ export class AdminUsuariosComponent implements OnInit {
     }
   }
 
-  eliminarUsuario(id: number) {
-    if (confirm('¿Eliminar este usuario?')) {
-      this.usuarioService.eliminarUsuario(id).subscribe({
-        next: () => {
-          this.toastService.show('Usuario eliminado', 'success');
-          this.cargarUsuarios();
+  eliminarUsuario(usuarioId: number) {
+    if (confirm('¿Estás seguro? Se cancelarán sus citas y se borrarán sus vehículos y cuenta.')) {
+
+      // 1. Traemos todos los vehículos del sistema
+      this.vehiculoService.listarTodosVehiculos().subscribe({
+        next: (todosLosVehiculos: any[]) => {
+
+          // 2. Filtramos los que pertenecen al usuario que queremos borrar
+          // REVISA: v.usuarioId debe coincidir con el nombre del campo en tu modelo Java
+          const vehiculosDelUsuario = todosLosVehiculos.filter(v => v.usuarioId === usuarioId);
+
+          // 3. Si tiene vehículos, limpiamos sus citas y luego los borramos
+          if (vehiculosDelUsuario.length > 0) {
+            vehiculosDelUsuario.forEach((vehiculo: any) => {
+
+              this.citaService.obtenerTodas().subscribe((todasLasCitas: any[]) => {
+                // Filtramos las citas de este vehículo por su matrícula
+                const citasDelCoche = todasLasCitas.filter(c => c.matriculaVehiculo === vehiculo.matricula);
+
+                citasDelCoche.forEach((cita: any) => {
+                  this.citaService.eliminarCita(cita.id).subscribe({
+                    next: () => console.log(`Cita ${cita.id} borrada`),
+                    error: () => console.log('Cita ya eliminada o error ignorado')
+                  });
+                });
+                // Ponemos las citas en estado CANCELADA
+                citasDelCoche.forEach((cita: any) => {
+                  this.citaService.cambiarEstado(cita.id, 'CANCELADA').subscribe();
+                });
+
+                // Borramos el vehículo físicamente
+                this.vehiculoService.eliminarVehiculo(vehiculo.id).subscribe();
+              });
+            });
+          }
+
+          // 4. El paso final: Borrar al usuario
+          // Esperamos 1.5 segundos para que al servidor le dé tiempo a borrar los vehículos
+          // 4. El paso final dentro de tu función eliminarUsuario
+          setTimeout(() => {
+            this.usuarioService.eliminarUsuario(usuarioId).subscribe({
+              next: () => {
+                // Si entra aquí, es que el backend devolvió un JSON perfecto
+                this.toastService.show('Usuario eliminado correctamente', 'success');
+                this.cargarUsuarios();
+              },
+              error: (err) => {
+                // CASO ESPECIAL: Si el status es 200, ¡ES QUE HA FUNCIONADO!
+                if (err.status === 200) {
+                  this.toastService.show('Usuario eliminado con éxito', 'success');
+                  this.cargarUsuarios();
+                }
+                // Si el error es 404, revisa la ruta en tu UsuarioService
+                else if (err.status === 404) {
+                  this.toastService.show('Error: No se encuentra la ruta de borrado en el servidor (404)', 'error');
+                  console.error('Revisa la URL en UsuarioService.eliminarUsuario. La URL intentada fue:', err.url);
+                }
+                else {
+                  this.toastService.show('Error real al eliminar el usuario', 'error');
+                  console.error('Detalle del error:', err);
+                }
+              }
+            });
+          }, 1500);
         },
-        error: () => this.toastService.show('Error al eliminar', 'error')
+        error: () => {
+          this.toastService.show('Error al obtener la lista de vehículos', 'error');
+        }
       });
     }
   }
