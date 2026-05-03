@@ -106,7 +106,9 @@ public class CitaServices {
         if (dto.getHora() != null) cita.setHora(dto.getHora());
         
         // Opcional: Si el DTO trae un estado, también lo actualizamos
-        // cita.setEstado(dto.getEstado()); 
+        if (dto.getEstado() != null && !dto.getEstado().isEmpty()) {
+            cita.setEstado(Estado.valueOf(dto.getEstado().toUpperCase()));
+        }
 
         // 4. Guardar y mapear (usando tu estilo estático)
         return citaMapper.toResponseDTO(citaRepository.save(cita));

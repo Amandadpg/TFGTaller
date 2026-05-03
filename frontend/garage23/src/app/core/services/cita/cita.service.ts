@@ -9,8 +9,8 @@ import { Observable } from 'rxjs';
 export class CitaService {
   private api = inject(ApiService);
 
-  obtenerTodas(): Observable<Cita[]> {
-    return this.api.get<Cita[]>('/citas');
+  obtenerTodas(): Observable<any[]> {
+    return this.api.get<any[]>('/citas');
   }
 
   buscarPorId(id: number): Observable<Cita> {
@@ -21,7 +21,7 @@ export class CitaService {
     return this.api.get<Cita[]>(`/citas/buscar?nombre=${nombre}`);
   }
 
-  reservar(cita: any): Observable<Cita> {
+  crearCita(cita: any): Observable<Cita> {
     return this.api.post<Cita>('/citas/reservar', cita);
   }
 
@@ -38,7 +38,7 @@ export class CitaService {
     return this.api.put<Cita>(`/citas/${id}/cliente`, cita);
   }
 
-  eliminarCita(id: number): Observable<string> {
-    return this.api.delete<string>(`/citas/${id}`);
+  eliminarCita(id: number): Observable<any> {
+    return this.api.delete<any>(`/citas/${id}`, { responseType: 'text' });
   }
 }

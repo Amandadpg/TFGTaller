@@ -7,9 +7,9 @@ import { AuthService } from '../../services/auth/auth.service';
   standalone: true,
   template: `
     <header class="h-16 bg-black shadow-md border-b border-gray-900 flex items-center justify-between px-6 z-10 sticky top-0">
-      <div class="flex items-center text-white font-semibold tracking-widest uppercase">
-        <h2 class="text-sm">Panel de Control</h2>
-      </div>
+      <span class="text-white font-black uppercase tracking-widest text-sm bg-gray-900 px-4 py-2 rounded-lg border border-gray-800 shadow-inner">
+        Panel de Control
+      </span>
       
       <div class="flex items-center gap-5">
         <div class="h-8 w-px bg-gray-800"></div>

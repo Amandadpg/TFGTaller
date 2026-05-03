@@ -37,9 +37,9 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="block text-brand-muted text-sm font-medium mb-2">Selecciona un Vehículo</label>
-              <select formControlName="matriculaVehiculo" class="w-full bg-brand-dark border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors">
+              <select formControlName="vehiculoId" class="w-full bg-brand-dark border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors">
                 <option value="" disabled selected>Elige tu vehículo...</option>
-                <option *ngFor="let v of vehiculos" [value]="v.matricula">{{ v.marca }} {{ v.modelo }} ({{ v.matricula }})</option>
+                <option *ngFor="let v of vehiculos" [value]="v.id">{{ v.marca }} {{ v.modelo }} ({{ v.matricula }})</option>
               </select>
               <p *ngIf="vehiculos.length === 0" class="text-xs text-red-400 mt-2">No tienes vehículos registrados. Ve a <a routerLink="/mis-vehiculos" class="text-primary hover:underline">Mis Vehículos</a> para añadir uno.</p>
             </div>
@@ -77,7 +77,7 @@ export class ReservarCitaComponent implements OnInit {
   isSubmitting = false;
 
   citaForm = this.fb.group({
-    matriculaVehiculo: ['', Validators.required],
+    vehiculoId: ['', Validators.required],
     fechaHora: ['', Validators.required],
   });
 
@@ -97,7 +97,7 @@ export class ReservarCitaComponent implements OnInit {
           this.servicioService.cargarServicios(); // no devuelve promise, but updates signal
           // Para no complicarlo mucho en este flow local, podríamos iterar cuando cargue
           setTimeout(() => {
-             this.servicioSeleccionado = this.servicioService.servicios().find(s => s.id === id) || null;
+            this.servicioSeleccionado = this.servicioService.servicios().find(s => s.id === id) || null;
           }, 500);
         } else {
           this.servicioSeleccionado = this.servicioService.servicios().find(s => s.id === id) || null;
@@ -118,11 +118,11 @@ export class ReservarCitaComponent implements OnInit {
     const request = {
       fecha: fecha,
       hora: hora,
-      matriculaVehiculo: this.citaForm.value.matriculaVehiculo,
-      nombreServicio: this.servicioSeleccionado.nombreServicio
+      vehiculoId: Number(this.citaForm.value.vehiculoId),
+      servicioId: Number(this.servicioSeleccionado.id)
     };
 
-    this.citaService.reservar(request).subscribe({
+    this.citaService.crearCita(request).subscribe({
       next: () => {
         this.toastService.show('Cita reservada correctamente', 'success');
         this.isSubmitting = false;

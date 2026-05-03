@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { ApiService } from '../api/api.service';
 import { Servicio } from '../../models/servicio.model';
 import { ToastService } from '../toast/toast.service';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +28,10 @@ export class ServicioService {
     });
   }
 
+  obtenerTodos(): Observable<any[]> {
+    return this.api.get<any[]>('/servicios');
+  }
+
   crearServicio(servicio: Partial<Servicio>) {
     return this.api.post<Servicio>('/servicios/', servicio);
   }
@@ -36,7 +41,7 @@ export class ServicioService {
   }
 
   eliminarServicio(id: number) {
-    return this.api.delete<string>(`/servicios/${id}`);
+    return this.api.delete<string>(`/servicios/${id}`, { responseType: 'json' });
   }
 
   buscarServiciosPorNombre(nombre: string) {

@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 export class UsuarioService {
   private api = inject(ApiService);
 
-  obtenerTodosUsuarios(): Observable<Usuario[]> {
+  listarTodos(): Observable<Usuario[]> {
     return this.api.get<Usuario[]>('/usuarios/');
   }
 
@@ -34,7 +34,7 @@ export class UsuarioService {
   }
 
   eliminarUsuario(id: number): Observable<string> {
-    return this.api.delete<string>(`/usuarios/${id}`);
+    return this.api.delete<string>(`/usuarios/${id}`, { responseType: 'json' });
   }
 
   obtenerUsuarioPorId(id: number): Observable<Usuario> {

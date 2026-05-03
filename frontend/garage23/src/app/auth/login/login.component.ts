@@ -113,7 +113,7 @@ export class LoginComponent {
           console.log('[LoginComponent] Rol detectado:', userRole);
           
           if (userRole === 'ADMIN' || userRole === 'ROLE_ADMIN') {
-            this.router.navigate(['/admin-dashboard']);
+            this.router.navigate(['/admin/dashboard']);
           } else if (userRole === 'CLIENTE' || userRole === 'ROLE_CLIENTE') {
             this.router.navigate(['/client-dashboard']);
           } else {

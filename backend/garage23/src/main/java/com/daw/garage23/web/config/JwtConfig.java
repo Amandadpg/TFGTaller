@@ -9,8 +9,8 @@ import lombok.Getter;
 @Getter
 public class JwtConfig {
 	
-    @Value("${jwt.secret}")
-    private String secret;
+	@Value("${jwt.secret:clave_super_secreta_para_el_taller_2026}")
+	private String secret;
 
     @Value("${jwt.access.expires}")
     private long accessTokenExpires;
