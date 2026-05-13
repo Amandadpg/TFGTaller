@@ -8,5 +8,5 @@
 }
 
 body {
-  @apply bg-brand-dark text-brand-light antialiased h-screen w-screen overflow-hidden;
+  @apply bg-brand-dark text-brand-light antialiased min-h-screen overflow-x-hidden;
 }

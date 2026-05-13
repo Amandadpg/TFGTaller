@@ -36,13 +36,27 @@ public class CitaServices {
     private CitaMapper citaMapper;
     
     public List<CitaResponseDTO> listarTodas() {
-        return citaMapper.toDTOList(citaRepository.findAll()); // <--- CAMBIADO
+        return citaMapper.toDTOList(citaRepository.findAll());
     }
     
     public CitaResponseDTO buscarPorId(int id) {
         Cita cita = citaRepository.findById(id)
                 .orElseThrow(() -> new CitaNotFoundException("No se encontró la cita con ID: " + id));
-        return citaMapper.toResponseDTO(cita); // <--- CAMBIADO
+        return citaMapper.toResponseDTO(cita);
+    }
+    
+    public List<String> obtenerHorasOcupadas(java.time.LocalDate fecha) {
+        List<Cita> citasDelDia = citaRepository.findByFecha(fecha);
+        
+        return citasDelDia.stream()
+                .filter(c -> c.getEstado() != Estado.CANCELADA)
+                .map(c -> c.getHora().toString().substring(0, 5))
+                .collect(Collectors.toList());
+    }
+
+    public List<CitaResponseDTO> listarCitasPorUsuario(int usuarioId) {
+        List<Cita> citas = citaRepository.findByVehiculoUsuarioId(usuarioId);
+        return citaMapper.toDTOList(citas);
     }
     
     public List<CitaResponseDTO> buscarCitasPorNombreUsuario(String nombre) {
@@ -51,10 +65,11 @@ public class CitaServices {
             throw new CitaNotFoundException("No hay citas para el usuario: " + nombre);
         }
         return citas.stream()
-                    .map(c -> citaMapper.toResponseDTO(c)) // <--- CAMBIADO
+                    .map(c -> citaMapper.toResponseDTO(c))
                     .collect(Collectors.toList());
     }
 
+    @Transactional
     public CitaResponseDTO reservar(CitaRequestDTO dto) {
         Vehiculo vehiculo = vehiculoServices.buscarEntidadPorId(dto.getVehiculoId());
         Servicio servicio = servicioServices.buscarEntidadPorId(dto.getServicioId());
@@ -66,7 +81,7 @@ public class CitaServices {
         cita.setVehiculo(vehiculo);
         cita.setServicio(servicio);
 
-        return citaMapper.toResponseDTO(citaRepository.save(cita)); // <--- CAMBIADO
+        return citaMapper.toResponseDTO(citaRepository.save(cita));
     }
 
     @Transactional
@@ -74,12 +89,10 @@ public class CitaServices {
         Cita cita = citaRepository.findById(idCita)
                 .orElseThrow(() -> new CitaNotFoundException("Cita no encontrada"));
 
-        // REGLA DE NEGOCIO: Si la cita ya está terminada o cancelada, no se puede tocar más
         if (cita.getEstado() == Estado.COMPLETADA || cita.getEstado() == Estado.CANCELADA) {
             throw new CitaException("No se puede cambiar el estado de una cita que ya está finalizada o cancelada.");
         }
 
-        // Actualizamos el estado
         cita.setEstado(nuevoEstado);
         
         return citaMapper.toResponseDTO(citaRepository.save(cita));
@@ -87,11 +100,9 @@ public class CitaServices {
     
     @Transactional
     public CitaResponseDTO modificarCitaAdmin(int id, CitaRequestDTO dto) {
-        // 1. Buscamos la cita (sin filtros de tiempo, el admin es el jefe)
         Cita cita = citaRepository.findById(id)
                 .orElseThrow(() -> new CitaNotFoundException("La cita no existe."));
 
-        // 2. Validamos el nuevo Vehículo y Servicio si se envían en el DTO
         if (dto.getVehiculoId() > 0) {
             Vehiculo vehiculo = vehiculoServices.buscarEntidadPorId(dto.getVehiculoId());
             cita.setVehiculo(vehiculo);
@@ -101,26 +112,21 @@ public class CitaServices {
             cita.setServicio(servicio);
         }
 
-        // 3. Aplicamos cambios básicos
         if (dto.getFecha() != null) cita.setFecha(dto.getFecha());
         if (dto.getHora() != null) cita.setHora(dto.getHora());
         
-        // Opcional: Si el DTO trae un estado, también lo actualizamos
         if (dto.getEstado() != null && !dto.getEstado().isEmpty()) {
             cita.setEstado(Estado.valueOf(dto.getEstado().toUpperCase()));
         }
 
-        // 4. Guardar y mapear (usando tu estilo estático)
         return citaMapper.toResponseDTO(citaRepository.save(cita));
     }
     
-    @Transactional // Es buena práctica añadirlo cuando modificas BD
+    @Transactional 
     public CitaResponseDTO modificarCitaCliente(int id, CitaRequestDTO dto) {
-        // 1. Buscar la cita (He cambiado Long por int porque tu repositorio usa int)
         Cita cita = citaRepository.findById(id)
                 .orElseThrow(() -> new CitaNotFoundException("Cita no encontrada con ID: " + id));
 
-        // 2. Lógica de las 24 horas
         LocalDateTime ahora = LocalDateTime.now();
         LocalDateTime fechaCita = LocalDateTime.of(cita.getFecha(), cita.getHora());
 
@@ -128,12 +134,10 @@ public class CitaServices {
             throw new CitaException("No puedes modificar; faltan menos de 24h para la cita.");
         }
 
-        // 3. Lógica del estado
         if (cita.getEstado() != Estado.PENDIENTE) {
             throw new CitaException("Solo se pueden modificar citas en estado PENDIENTE.");
         }
 
-        // 4. Actualizar datos (Fecha y Hora)
         cita.setFecha(dto.getFecha());
         cita.setHora(dto.getHora());
         
@@ -142,12 +146,10 @@ public class CitaServices {
     
     @Transactional
     public void eliminarCita(int idCita) {
-        // 1. Verificamos si existe
         if (!citaRepository.existsById(idCita)) {
             throw new CitaNotFoundException("No se puede eliminar: La cita con ID " + idCita + " no existe.");
         }
 
-        // 2. Borramos
         citaRepository.deleteById(idCita);
     }
     
@@ -155,8 +157,6 @@ public class CitaServices {
         Cita cita = citaRepository.findById(idCita).orElse(null);
         if (cita == null) return false;
         
-        // Comprobamos si el email del dueño del vehículo de la cita 
-        // coincide con el email del token JWT
         return cita.getVehiculo().getUsuario().getEmail().equals(emailUsuarioLogueado);
     }
 }

@@ -8,7 +8,7 @@ import { ToastService } from '../../core/services/toast/toast.service';
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [CommonModule],
   template: `
     <div class="font-sans overflow-hidden bg-black text-white">
       

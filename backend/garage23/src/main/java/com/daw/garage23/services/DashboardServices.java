@@ -39,7 +39,6 @@ public class DashboardServices {
         Double ingresos = citaRepository.calcularIngresosTotales();
         double ingresosEstimados = (ingresos != null) ? ingresos : 0.0;
 
-        // Agenda próximos 3 días (incluyendo hoy)
         LocalDate hoy = LocalDate.now();
         LocalDate limite = hoy.plusDays(3);
         List<Cita> citasAgendaEntity = citaRepository.findCitasProximosDias(hoy, limite);

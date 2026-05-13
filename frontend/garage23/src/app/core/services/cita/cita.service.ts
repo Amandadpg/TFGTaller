@@ -9,6 +9,23 @@ import { Observable } from 'rxjs';
 export class CitaService {
   private api = inject(ApiService);
 
+  obtenerCitasPorUsuario(usuarioId: number): Observable<any[]> {
+    // Ajusta la URL si tu backend espera otra cosa
+    return this.api.get<any[]>(`/citas?usuarioId=${usuarioId}`);
+  }
+
+  obtenerHorasOcupadas(fecha: string): Observable<string[]> {
+    return this.api.get<string[]>(`/citas/horas-ocupadas?fecha=${fecha}`);
+  }
+
+  // Llama a la ruta PATCH que cambia el estado
+  cancelarCita(idCita: number): Observable<any> {
+    return this.api.patch(`/citas/${idCita}/estado?nuevoEstado=CANCELADA`, {});
+  }
+
+  obtenerMisCitas(): Observable<any[]> {
+    return this.api.get<any[]>('/citas/mis-citas');
+  }
   obtenerTodas(): Observable<any[]> {
     return this.api.get<any[]>('/citas');
   }

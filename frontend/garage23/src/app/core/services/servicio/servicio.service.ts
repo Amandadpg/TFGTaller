@@ -16,7 +16,7 @@ export class ServicioService {
 
   cargarServicios() {
     this.isLoading.set(true);
-    this.api.get<Servicio[]>('/servicios/').subscribe({
+    this.api.get<Servicio[]>('/servicios').subscribe({
       next: (data) => {
         this.servicios.set(data);
         this.isLoading.set(false);
@@ -33,7 +33,7 @@ export class ServicioService {
   }
 
   crearServicio(servicio: Partial<Servicio>) {
-    return this.api.post<Servicio>('/servicios/', servicio);
+    return this.api.post<Servicio>('/servicios', servicio);
   }
 
   actualizarServicio(id: number, servicio: Partial<Servicio>) {

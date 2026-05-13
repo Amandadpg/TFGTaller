@@ -11,8 +11,13 @@ export class VehiculoService {
   private api = inject(ApiService);
   private http = inject(HttpClient);
 
-  listarTodosVehiculos(): Observable<Vehiculo[]> {
-    return this.api.get<Vehiculo[]>('/vehiculos');
+  listarTodosVehiculos(): Observable<any[]> {
+    return this.api.get<any[]>('/vehiculos');
+  }
+
+  // Para el CLIENTE: Trae solo los suyos (Apunta a '/vehiculos/mis-vehiculos')
+  obtenerMisVehiculos(): Observable<Vehiculo[]> {
+    return this.api.get<Vehiculo[]>('/vehiculos/mis-vehiculos');
   }
 
   listarVehiculosPorUsuario(usuarioId: number): Observable<Vehiculo[]> {

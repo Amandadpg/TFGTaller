@@ -27,15 +27,12 @@ public class ServicioServices {
 	// Admin y usuario
 	public List<ServicioResponseDTO> buscarServiciosPorNombre(String nombre) {
 
-	    // 1. Buscamos en el repositorio (esto devuelve una lista de Entidades)
 	    List<Servicio> servicios = servicioRepository.findByNombreServicioContainingIgnoreCase(nombre);
 
-	    // 2. Si la lista está vacía, lanzamos nuestra excepción personalizada
 	    if (servicios.isEmpty()) {
 	        throw new ServicioException("No se encontraron servicios con nombre que contenga: " + nombre);
 	    }
 
-	    // 3. Usamos el Mapper para convertir la lista de Entidades a lista de DTOs
 	    return ServicioMapper.toResponseDTOList(servicios);
 	}
 
@@ -73,7 +70,6 @@ public class ServicioServices {
         servicioRepository.delete(servicio);
     }
 
-    // Método privado para centralizar validaciones
     private void validarServicio(ServicioRequestDTO dto, Integer id) {
         if (dto.getNombreServicio() == null || dto.getNombreServicio().isBlank()) {
             throw new ServicioException("El nombre del servicio es obligatorio.");

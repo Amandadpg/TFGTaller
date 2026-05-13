@@ -58,7 +58,7 @@ import { VehiculoService } from '../../../core/services/vehiculo/vehiculo.servic
                       <div class="flex justify-between items-center mb-2">
                         <span class="text-pink-500 font-black text-lg bg-pink-500/10 px-2 rounded">{{ cita.hora }}</span>
                       </div>
-                      <p class="text-white font-bold text-sm uppercase">{{ cita.servicio || 'Servicio Programado' }}</p>
+                      <p class="text-white font-bold text-sm uppercase">{{ cita.nombreServicio || 'Servicio Programado' }}</p>
                       <p class="text-xs text-gray-400 mt-2 font-mono">
                         🚗 Matrícula: <span class="text-gray-200">{{ cita.matriculaVehiculo }}</span>
                       </p>

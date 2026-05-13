@@ -41,4 +41,9 @@ export class UsuarioService {
     return this.api.get<Usuario>(`/usuarios/${id}`);
   }
 
+  obtenerMisVehiculos(): Observable<any[]> {
+    return this.api.get<any[]>('/vehiculos/mis-vehiculos');
+  }
+
+
 }

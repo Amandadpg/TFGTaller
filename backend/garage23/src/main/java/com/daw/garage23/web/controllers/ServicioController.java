@@ -28,16 +28,16 @@ public class ServicioController {
 	
 	// Admin y usuario
     // Listar todos los servicios
-    @GetMapping("/")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
+    @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENTE')")
     public ResponseEntity<List<ServicioResponseDTO>> listarServicios() {
         return ResponseEntity.ok(servicioServices.listarTodosServicios());
     }
 
     // Admin
     // Añadir servicio
-    @PostMapping("/")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ServicioResponseDTO> crearServicio(@RequestBody ServicioRequestDTO request) {
         return ResponseEntity.ok(servicioServices.añadirServicio(request));
     }
@@ -45,7 +45,7 @@ public class ServicioController {
     // Admin
     // Modificar servicio
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ServicioResponseDTO> actualizarServicio(
             @PathVariable int id, 
             @RequestBody ServicioRequestDTO request) {
@@ -55,7 +55,7 @@ public class ServicioController {
     // Admin
     // Eliminar servicio
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> eliminarServicio(@PathVariable int id) {
         servicioServices.eliminarServicio(id);
         return ResponseEntity.ok("Servicio eliminado correctamente");
@@ -64,7 +64,7 @@ public class ServicioController {
     // Admin y usuario
     // Buscar servicio por nombre
     @GetMapping("/buscar")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENTE')")
     public ResponseEntity<List<ServicioResponseDTO>> buscarPorNombre(@RequestParam String nombre) {
         return ResponseEntity.ok(servicioServices.buscarServiciosPorNombre(nombre));
     }

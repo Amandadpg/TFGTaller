@@ -12,7 +12,7 @@ import com.daw.garage23.services.dto.Citas.CitaResponseDTO;
 import com.daw.garage23.services.dto.Vehiculos.VehiculoRequestDTO;
 import com.daw.garage23.services.dto.Vehiculos.VehiculoResponseDTO;
 
-@Component // Añadido
+@Component
 public class VehiculoMapper {
 	
 	@Autowired
@@ -37,9 +37,9 @@ public class VehiculoMapper {
                 .map(cita -> citaMapper.toResponseDTO(cita))
                 .collect(Collectors.toList());
             
-            dto.setCitas(listaCitas); // Si aquí sigue el rojo, es que el DTO no tiene setCitas(List<...>)
+            dto.setCitas(listaCitas);
         } else {
-            dto.setCitas(new ArrayList<>()); // Evitamos nulos
+            dto.setCitas(new ArrayList<>());
         }
         return dto;
     }
@@ -58,13 +58,11 @@ public class VehiculoMapper {
         return vehiculo;
     }
 
-    /**
-     * Actualiza una entidad existente con los datos nuevos del DTO
-     */
     public void updateEntityFromDTO(VehiculoRequestDTO dto, Vehiculo entidad) {
         if (dto == null || entidad == null) return;
         entidad.setMatricula(dto.getMatricula());
         entidad.setMarca(dto.getMarca());
         entidad.setModelo(dto.getModelo());
         entidad.setTipo(dto.getTipo());
-    }}
+    }
+ }

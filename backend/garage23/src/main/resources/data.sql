@@ -1,16 +1,24 @@
-INSERT INTO `usuario` (`nombre`, `apellidos`, `dni`, `telefono`, `email`, `direccion`, `contrasena`, `rol`) VALUES
-('Alejandro', 'García Ruiz', '12345678A', '600111222', 'alex@email.com', 'Calle Mayor 1', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'),
-('Beatriz', 'Sanz Martín', '23456789B', '600333444', 'bea@email.com', 'Av. Constitución 45', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'),
-('Cristian', 'López Vega', '34567890C', '600555666', 'cris@email.com', 'Paseo del Prado 12', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'),
-('Daniela', 'Hidalgo Porras', '45678901D', '600777888', 'dani@email.com', 'Calle Real 8', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'),
-('Eduardo', 'Gómez Ferrero', '56789012E', '600999000', 'edu@email.com', 'Calle Luna 3', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'),
-('Fátima', 'Blanco Soler', '67890123F', '611222333', 'fati@email.com', 'Av. de Europa 90', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'),
-('Gonzalo', 'Méndez Castro', '78901234G', '622333444', 'gon@email.com', 'Calle Estrecha 2', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'),
-('Helena', 'Ortega Cano', '89012345H', '633444555', 'hele@email.com', 'Plaza de España 15', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'),
-('Iván', 'Torres Quevedo', '90123456I', '644555666', 'ivan@email.com', 'Calle del Pez 22', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'),
-('Julia', 'Navarro Gil', '01234567J', '655666777', 'julia@email.com', 'Calle Nueva 5', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'),
-('Kevin', 'Parrado Diez', '11223344K', '666777888', 'kevin@email.com', 'Calle Sol 44', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'),
-('Laura', 'Vidal Moreno', '22334455L', '677888999', 'laura@email.com', 'Av. Mediterráneo 7', '$2a$10$zYm8S7P8v3I.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV.vV', 'CLIENTE'); 
+
+INSERT INTO usuario (nombre, apellidos, dni, telefono, email, direccion, contrasena, rol) VALUES
+('Roberto', 'Jiménez García', '55555555F', '655555555', 'roberto.j@gmail.com', 'Calle Mayor 12', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Sofía', 'Ruiz Martínez', '66666666G', '666666666', 'sofia.ruiz@outlook.es', 'Av. Constitución 4', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Fernando', 'Alonso Díaz', '14141414F', '614141414', 'magic.alonso@gmail.com', 'Circuito Asturias 33', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Lucía', 'Fernández Sanz', '77777777H', '677777777', 'lucia.fer@yahoo.es', 'Calle Luna 45', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Marcos', 'Torres Leal', '88888888I', '688888888', 'marcos.t@hotmail.com', 'Calle Estrecha 2', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Paula', 'Vázquez Oro', '99999999J', '699999999', 'paula.vaz@gmail.com', 'Paseo Marítimo 10', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Alejandro', 'Sánchez Poo', '10101010K', '610101010', 'alex.san@gmail.com', 'Calle Nueva 1', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Marta', 'Calvo Soler', '20202020L', '620202020', 'marta.c@icloud.com', 'Calle Alta 5', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Javier', 'Gómez Noya', '30303030M', '630303030', 'javi.g@gmail.com', 'Av. De los Deportes 8', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Beatriz', 'Pascual Rey', '40404040N', '640404040', 'bea.p@outlook.com', 'Calle Silencio 14', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Ignacio', 'López Portillo', '50505050P', '650505050', 'nacho.l@gmail.com', 'Calle Principal 100', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Raquel', 'Méndez Alba', '60606060Q', '660606060', 'raquel.m@gmail.com', 'Calle Jardines 3', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Hugo', 'Silva Rojo', '70707070R', '670707070', 'hugo.silva@cine.es', 'Plaza Mayor 5', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Sara', 'Carbonero Aranda', '80808080S', '680808080', 'sara.c@periodismo.es', 'Calle Radio 22', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Adrián', 'Lastra Cano', '90909090T', '690909090', 'adrian.l@gmail.com', 'Calle Teatro 9', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Carmen', 'Machi Pozo', '12121212V', '612121212', 'carmen.m@gmail.com', 'Calle Comedia 1', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Luis', 'Tosar López', '13131313W', '613131313', 'luis.tosar@galicia.es', 'Calle Celda 211', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Blanca', 'Suárez Leyva', '15151515X', '615151515', 'blanca.s@actriz.es', 'Calle Barco 4', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE'),
+('Mario', 'Casas Sierra', '16161616Y', '616161616', 'mario.c@gmail.com', 'Calle Tres Metros 3', 'lJqD5aELlxjCNKjf0a1dlwbe73iyzYdesh+qeRh07UA=', 'CLIENTE');
 
 INSERT INTO `vehiculo` (`matricula`, `marca`, `modelo`, `tipo`, `id_usuario`) VALUES
 ('2345-BBC', 'Volkswagen', 'Golf GTI', 'COCHE', 2),
@@ -26,34 +34,45 @@ INSERT INTO `vehiculo` (`matricula`, `marca`, `modelo`, `tipo`, `id_usuario`) VA
 ('8899-CCF', 'Tesla', 'Model 3', 'COCHE', 12),
 ('1010-DDG', 'Fiat', '500 Abarth', 'COCHE', 13);
 
-INSERT INTO `servicio` (`nombre_servicio`, `descripcion`, `precio`, `duracion_minutos`) VALUES
-('Revisión Estándar', 'Revisión completa en Taller Principal', 85.50, 90),
-('Carga Aire A/C', 'Recarga de gas en Box 1', 60.00, 45),
-('Frenos Delanteros', 'Cambio de pastillas en Box 2', 110.00, 120),
-('Diagnosis OBD2', 'Escaneo de fallos en Zona Electrónica', 35.00, 30),
-('Pulido Faros', 'Restauración en Zona Estética', 50.00, 75),
-('Cambio Aceite', 'Sintético 5W30 en Taller Principal', 70.00, 40),
-('Neumáticos (2)', 'Montaje y equilibrado en Box Neumáticos', 180.00, 60),
-('Limpieza Inyectores', 'Tratamiento químico en Zona Motor', 95.00, 150),
-('Batería Nueva', 'Sustitución en Taller Principal', 115.00, 20),
-('Alineación', 'Ajuste de dirección en Box 3', 55.00, 50),
-('ITV Previa', 'Revisión pre-inspección en Taller Principal', 40.00, 60),
-('Lavado VIP', 'Limpieza integral en Zona Estética', 65.00, 90);
+INSERT INTO servicio (nombre_servicio, descripcion, precio, duracion_minutos) VALUES
+('Lubricación Alta Gama', 'Aceite y filtro respetando especificaciones del fabricante.', 95.00, 60),
+('Optimización de Contacto', 'Cambio de neumáticos, alineación y calibración exacta.', 40.00, 90),
+('Lavado Integral', 'Reacondicionamiento profundo interior/exterior.', 120.00, 180),
+('Recogida y Entrega VIP', 'Servicio puerta a puerta con máxima seguridad y discreción.', 25.00, 30),
+('Tratamiento Cerámico', 'Protección de pintura de concurso con recubrimiento cerámico.', 350.00, 360),
+('Diagnosis Electrónica Premium', 'Lectura avanzada de centralita y telemetría de rendimiento.', 75.00, 45),
+('Frenos Alto Rendimiento', 'Sustitución de pastillas y purgado de líquido deportivo.', 210.00, 120);
 
 
-INSERT INTO `cita` (`fecha`, `hora`, `id_servicio`, `id_vehiculo`, `estado`) VALUES
-('2026-05-10', '09:00:00', 1, 1, 'PENDIENTE'),
-('2026-05-10', '11:30:00', 2, 1, 'PENDIENTE'),
-('2026-05-11', '10:00:00', 3, 2, 'COMPLETADA'),
-('2026-05-11', '12:00:00', 4, 3, 'PENDIENTE'),
-('2026-05-12', '08:30:00', 5, 4, 'CANCELADA'),
-('2026-05-12', '13:00:00', 6, 4, 'PENDIENTE'),
-('2026-05-13', '10:30:00', 7, 5, 'PENDIENTE'),
-('2026-05-13', '16:00:00', 8, 6, 'COMPLETADA'),
-('2026-05-14', '09:15:00', 9, 7, 'PENDIENTE'),
-('2026-05-14', '11:45:00', 10, 8, 'PENDIENTE'),
-('2026-05-15', '10:00:00', 11, 9, 'PENDIENTE'),
-('2026-05-15', '12:30:00', 12, 9, 'COMPLETADA');
+INSERT INTO cita (id, fecha, hora, estado, id_servicio, id_vehiculo) VALUES
+-- 14 de Mayo
+(1, '2026-05-14', '09:00:00', 'COMPLETADA', 2, 1),
+(2, '2026-05-14', '10:00:00', 'COMPLETADA', 4, 3),
+(3, '2026-05-14', '11:30:00', 'CANCELADA', 6, 2),
+(4, '2026-05-14', '16:00:00', 'PENDIENTE', 1, 4),
+
+-- 15 de Mayo
+(5, '2026-05-15', '09:30:00', 'PENDIENTE', 5, 3), 
+(6, '2026-05-15', '15:00:00', 'PENDIENTE', 7, 1),
+(7, '2026-05-15', '16:00:00', 'CANCELADA', 3, 5),
+
+-- 18 de Mayo (Lunes)
+(8, '2026-05-18', '09:00:00', 'PENDIENTE', 1, 1),
+(9, '2026-05-18', '11:00:00', 'PENDIENTE', 2, 2),
+(10, '2026-05-18', '16:30:00', 'PENDIENTE', 6, 3),
+
+-- 20 de Mayo
+(11, '2026-05-20', '09:30:00', 'PENDIENTE', 4, 1),
+(12, '2026-05-20', '12:00:00', 'PENDIENTE', 5, 4),
+
+-- 22 de Mayo (Viernes)
+(13, '2026-05-22', '09:00:00', 'PENDIENTE', 1, 5),
+(14, '2026-05-22', '10:30:00', 'PENDIENTE', 2, 4),
+(15, '2026-05-22', '11:30:00', 'CANCELADA', 7, 1),
+
+-- 24 de Mayo
+(16, '2026-05-24', '11:00:00', 'PENDIENTE', 6, 3),
+(17, '2026-05-24', '12:00:00', 'PENDIENTE', 3, 2);
 
 
 -- Creamos un usuario de prueba si no existe

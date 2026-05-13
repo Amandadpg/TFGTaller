@@ -9,8 +9,8 @@ import com.daw.garage23.persistence.entities.Usuario;
 import com.daw.garage23.persistence.entities.enums.Rol;
 import com.daw.garage23.persistence.repositories.UsuarioRepository;
 
-@Component // Importante: @Component para que Spring lo detecte como un bean ejecutable
-public class DataInitializer implements CommandLineRunner { // IMPORTANTE: implements CommandLineRunner
+@Component 
+public class DataInitializer implements CommandLineRunner { 
 	
 	@Autowired
     private UsuarioRepository usuarioRepository;
@@ -18,10 +18,9 @@ public class DataInitializer implements CommandLineRunner { // IMPORTANTE: imple
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Override // Anotación necesaria
+    @Override 
     public void run(String... args) {
         try {
-            // Solo creamos el admin si la tabla está vacía o el email no existe
             if (!usuarioRepository.existsByEmail("admin@garage.com")) {
                 System.out.println("--- INICIANDO CARGA DE DATOS ---");
 

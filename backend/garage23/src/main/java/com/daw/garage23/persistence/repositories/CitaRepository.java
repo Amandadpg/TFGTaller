@@ -18,11 +18,15 @@ public interface CitaRepository extends JpaRepository<Cita, Integer>{
 	boolean existsByFechaAndHora(LocalDate fecha, LocalTime hora);
 	
 	List<Cita> findByVehiculoUsuarioNombreContainingIgnoreCase(String nombre);
+	
+	List<Cita> findByVehiculoUsuarioId(int usuarioId);
 
     @Query("SELECT SUM(s.precio) FROM Cita c JOIN c.servicio s WHERE c.estado = 'COMPLETADA'")
     Double calcularIngresosTotales();
 
     long countByEstadoAndFecha(Estado estado, LocalDate fecha);
+    
+    List<Cita> findByFecha(java.time.LocalDate fecha);
     
     @Query("SELECT c FROM Cita c WHERE c.fecha BETWEEN :hoy AND :limite ORDER BY c.fecha ASC, c.hora ASC")
     List<Cita> findCitasProximosDias(@Param("hoy") LocalDate hoy, @Param("limite") LocalDate limite);

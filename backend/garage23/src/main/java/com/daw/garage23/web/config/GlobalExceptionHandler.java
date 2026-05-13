@@ -1,5 +1,6 @@
 package com.daw.garage23.web.config;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -61,6 +62,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleOtherExceptions(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                              .body("Error inesperado: " + ex.getMessage());
+    }
+    
+ // --- Errores de Integridad de Base de Datos (Duplicados SQL) ---
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDatabaseExceptions(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("El registro ya existe en la base de datos (Email, DNI o Matrícula repetida).");
     }
 
 }

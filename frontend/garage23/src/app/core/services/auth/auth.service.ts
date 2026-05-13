@@ -14,6 +14,9 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
+  getCurrentUser() {
+    throw new Error('Method not implemented.');
+  }
   private http = inject(HttpClient);
   private router = inject(Router);
   private readonly baseUrl = `${environment.apiUrl}/auth`;

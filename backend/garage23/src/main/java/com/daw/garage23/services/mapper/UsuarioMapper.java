@@ -1,6 +1,6 @@
 package com.daw.garage23.services.mapper;
 
-import java.util.ArrayList; // Añadido por seguridad
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,10 +37,9 @@ public class UsuarioMapper {
             dto.setRol(usuario.getRol().name());
         }
 
-     // Dentro de UsuarioMapper.java
         if (usuario.getVehiculos() != null) {
             dto.setVehiculos(usuario.getVehiculos().stream()
-                .map(v -> vehiculoMapper.toResponseDTO(v)) // Ahora existe y no es estático
+                .map(v -> vehiculoMapper.toResponseDTO(v)) 
                 .collect(Collectors.toList()));
         }
 
@@ -60,7 +59,6 @@ public class UsuarioMapper {
         return usuario;
     }
     
-    // ESTE MÉTODO TAMBIÉN TE FALTABA
     public void updateEntityFromDTO(UsuarioUpdateRequestDTO dto, Usuario entidad) {
         if (dto == null) return;
         entidad.setNombre(dto.getNombre());

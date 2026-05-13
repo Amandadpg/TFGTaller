@@ -2,6 +2,7 @@ package com.daw.garage23.web.controllers;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.daw.garage23.persistence.entities.Vehiculo;
+import com.daw.garage23.services.UsuarioServices;
 import com.daw.garage23.services.VehiculoServices;
 import com.daw.garage23.services.dto.Vehiculos.VehiculoRequestDTO;
 import com.daw.garage23.services.dto.Vehiculos.VehiculoResponseDTO;
@@ -27,24 +28,27 @@ public class VehiculoController {
 	@Autowired
     private VehiculoServices vehiculoServices;
 	
+	@Autowired
+    private UsuarioServices usuarioServices;
 	
-	//Lista todos los vehiculos
-	@GetMapping
-	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/mis-vehiculos")
+    @PreAuthorize("hasAuthority('CLIENTE')")
+    public ResponseEntity<List<VehiculoResponseDTO>> listarMisVehiculos(Authentication authentication) {
+        String email = authentication.getName(); 
+        
+        int usuarioId = usuarioServices.obtenerIdPorEmail(email); 
+        
+        return ResponseEntity.ok(vehiculoServices.listarVehiculosPorUsuario(usuarioId));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<VehiculoResponseDTO>> listarTodosVehiculos() {
         return ResponseEntity.ok(vehiculoServices.listarTodosVehiculos());
     }
 
-    // Listar vehículos de un usuario
-    @GetMapping("/usuario/{usuarioId}")
-    @PreAuthorize("hasRole('ADMIN') or @usuarioServices.esElMismoUsuario(#usuarioId, authentication.name)")
-    public ResponseEntity<List<VehiculoResponseDTO>> listarVehiculosPorUsuario(@PathVariable int usuarioId) {
-        return ResponseEntity.ok(vehiculoServices.listarVehiculosPorUsuario(usuarioId));
-    }
-
-    // Buscar vehículo por matrícula
     @GetMapping("/buscar-matricula")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENTE')") 
     public ResponseEntity<List<VehiculoResponseDTO>> buscarVehiculosPorMatri(@RequestParam String matricula) {
         List<VehiculoResponseDTO> vehiculos = vehiculoServices.buscarVehiculosPorMatricula(matricula);
         return ResponseEntity.ok(vehiculos);
@@ -52,31 +56,50 @@ public class VehiculoController {
 
     // Buscar vehículo por marca
     @GetMapping("/buscar-marca")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<VehiculoResponseDTO>> buscarVehiculosPorMarca(@RequestParam String marca) {
         List<VehiculoResponseDTO> vehiculos = vehiculoServices.buscarVehiculosPorMarca(marca);
         return ResponseEntity.ok(vehiculos);
     }
 
-    // Dar de alta vehículo
     @PostMapping("/alta")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
-    public ResponseEntity<VehiculoResponseDTO> darAltaVehiculo(@RequestBody VehiculoRequestDTO request) {
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENTE')")
+    public ResponseEntity<VehiculoResponseDTO> darAltaVehiculo(@RequestBody VehiculoRequestDTO request, Authentication authentication) {
+        
+        if (request.getDniCliente() == null || request.getDniCliente().trim().isEmpty()) {
+            
+            String email = authentication.getName();
+            
+            int idUsuario = usuarioServices.obtenerIdPorEmail(email);
+            String dniReal = usuarioServices.buscarEntidadPorId(idUsuario).getDni();
+            
+            request.setDniCliente(dniReal);
+        }
+
         return ResponseEntity.ok(vehiculoServices.darAltaVehiculo(request));
     }
 
-    // Modificar vehículo
     @PutMapping("/{vehiculoId}")
-    @PreAuthorize("hasRole('ADMIN') or @vehiculoServices.esDuenioDelVehiculo(#vehiculoId, authentication.name)")
+    @PreAuthorize("hasAuthority('ADMIN') or @vehiculoServices.esDuenioDelVehiculo(#vehiculoId, authentication.name)") 
     public ResponseEntity<VehiculoResponseDTO> modificarVehiculo(
             @PathVariable int vehiculoId, 
-            @RequestBody VehiculoRequestDTO request) {
+            @RequestBody VehiculoRequestDTO request,
+            Authentication authentication) { 
+        
+        if (request.getDniCliente() == null || request.getDniCliente().trim().isEmpty()) {
+            String email = authentication.getName();
+            
+            int idUsuario = usuarioServices.obtenerIdPorEmail(email);
+            String dniReal = usuarioServices.buscarEntidadPorId(idUsuario).getDni();
+            
+            request.setDniCliente(dniReal);
+        }
+
         return ResponseEntity.ok(vehiculoServices.modificarVehiculo(vehiculoId, request));
     }
 
-    // Eliminar vehículo
     @DeleteMapping("/{vehiculoId}")
-    @PreAuthorize("hasRole('ADMIN') or @vehiculoServices.esDuenioDelVehiculo(#vehiculoId, authentication.name)")
+    @PreAuthorize("hasAuthority('ADMIN') or @vehiculoServices.esDuenioDelVehiculo(#vehiculoId, authentication.name)") // <-- CAMBIADO
     public ResponseEntity<String> eliminarVehiculo(@PathVariable int vehiculoId) {
 
         vehiculoServices.eliminarVehiculo(vehiculoId);

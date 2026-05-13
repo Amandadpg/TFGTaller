@@ -58,9 +58,9 @@ import { filter } from 'rxjs';
               
               <!-- Si es cliente, su perfil y salir -->
               <ng-container *ngIf="isCliente()">
-                <a routerLink="/mi-perfil" class="flex items-center gap-2 text-white hover:text-primary transition-colors font-bold text-sm tracking-widest uppercase group">
+                <a routerLink="/client-dashboard" class="flex items-center gap-2 text-white hover:text-primary transition-colors font-bold text-sm tracking-widest uppercase group">
                   <svg class="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                  Mi Perfil
+                  Mi Panel
                 </a>
               </ng-container>
 
@@ -102,7 +102,7 @@ import { filter } from 'rxjs';
           </ng-container>
 
           <ng-container *ngIf="isAuthenticated()">
-            <a *ngIf="isCliente()" routerLink="/mi-perfil" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Mi Perfil</a>
+            <a *ngIf="isCliente()" routerLink="/client-dashboard" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Mi Panel</a>
             <a *ngIf="isCliente()" routerLink="/reservar" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Reservar Cita</a>
             <a *ngIf="isAdmin()" routerLink="/admin/dashboard" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Panel Admin</a>
             <button (click)="logout()" class="text-red-500 hover:text-red-400 w-full text-left px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Salir</button>

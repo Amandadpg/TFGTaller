@@ -6,10 +6,9 @@ import org.springframework.stereotype.Component; // Añadido
 import com.daw.garage23.persistence.entities.Cita;
 import com.daw.garage23.services.dto.Citas.CitaResponseDTO;
 
-@Component // Añadido
+@Component
 public class CitaMapper {
 
-    // Quitamos static y cambiamos nombre a toResponseDTO
     public CitaResponseDTO toResponseDTO(Cita cita) {
         if (cita == null) return null;
 
@@ -36,7 +35,7 @@ public class CitaMapper {
     public List<CitaResponseDTO> toDTOList(List<Cita> citas) {
         if (citas == null) return List.of();
         return citas.stream()
-                    .map(this::toResponseDTO) // Usamos this
+                    .map(this::toResponseDTO)
                     .collect(Collectors.toList());
     }
 }

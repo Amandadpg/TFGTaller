@@ -109,7 +109,6 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
             <label class="block text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Estado</label>
             <select formControlName="estado" class="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white outline-none focus:border-pink-500 h-[50px]">
               <option value="PENDIENTE">Pendiente</option>
-              <option value="EN_CURSO">En Curso</option>
               <option value="COMPLETADA">Completada</option>
               <option value="CANCELADA">Cancelada</option>
             </select>

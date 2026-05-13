@@ -3,14 +3,18 @@ package com.daw.garage23.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.daw.garage23.persistence.entities.Cita;
 import com.daw.garage23.persistence.entities.Usuario;
 import com.daw.garage23.persistence.entities.Vehiculo;
+import com.daw.garage23.persistence.entities.enums.Estado;
 import com.daw.garage23.persistence.entities.enums.Rol;
 import com.daw.garage23.persistence.repositories.UsuarioRepository;
 import com.daw.garage23.services.dto.Usuarios.UsuarioContrasenaRequestDTO;
@@ -28,15 +32,13 @@ public class UsuarioServices implements UserDetailsService{
 	
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-	    // 1. Buscamos en TU base de datos
 	    Usuario usuario = usuarioRepository.findByEmail(email)
 	            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
 
-	    // 2. IMPORTANTE: Devolvemos el User de Spring Security con la clave ENCRIPTADA de la BD
-	    return org.springframework.security.core.userdetails.User.builder()
+	    return User.builder()
 	            .username(usuario.getEmail())
-	            .password(usuario.getContrasena()) // Aquí va el $2a$10...
-	            .roles(usuario.getRol().name())    // "ADMIN" o "CLIENTE"
+	            .password(usuario.getContrasena()) 
+	            .authorities(usuario.getRol().name())
 	            .build();
 	}
 
@@ -45,11 +47,15 @@ public class UsuarioServices implements UserDetailsService{
     
     @Autowired
     private UsuarioMapper usuarioMapper;
+    
+    @Autowired
+    @Lazy
+    private PasswordEncoder passwordEncoder;
 
     // Solo admin
     public List<UsuarioResponseDTO> listarTodosUsuarios() {
         List<Usuario> usuarios = usuarioRepository.findAll();
-        return usuarioMapper.toResponseDTOList(usuarios); // <--- CAMBIADO
+        return usuarioMapper.toResponseDTOList(usuarios); 
     }
     
     public Usuario buscarEntidadPorId(int id) {
@@ -60,7 +66,7 @@ public class UsuarioServices implements UserDetailsService{
     // Solo admin
     public UsuarioResponseDTO obtenerUsuarioPorId(int id) {
         Usuario usuario = buscarEntidadPorId(id);
-        return usuarioMapper.toResponseDTO(usuario); // <--- CAMBIADO
+        return usuarioMapper.toResponseDTO(usuario); 
     }
 
     // Admin
@@ -69,27 +75,27 @@ public class UsuarioServices implements UserDetailsService{
         if (usuarios.isEmpty()) {
             throw new UsuarioException("No se encontraron usuarios con nombre que contenga: " + nombre);
         }
-        return usuarioMapper.toResponseDTOList(usuarios); // <--- Corregido método y minúscula
+        return usuarioMapper.toResponseDTOList(usuarios); 
     }
 
     // Cliente y admin
     public UsuarioResponseDTO registrar(UsuarioRegistroRequestDTO request) {
+        
+        if (request.getDni() != null) {
+            request.setDni(request.getDni().toUpperCase().trim());
+        }
+        if (request.getEmail() != null) {
+            request.setEmail(request.getEmail().toLowerCase().trim());
+        }
+
         if (request.getContrasena() == null || !request.getContrasena().equals(request.getConfirmarContrasena())) {
             throw new UsuarioException("Las contraseñas no coinciden. Por favor, verifícalas.");
         }
-        
-        if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new UsuarioException("Ya existe un usuario con ese email");
-        }
-        
-        if (usuarioRepository.existsByDni(request.getDni())) {
-            throw new UsuarioException("Ya existe un usuario registrado con el DNI: " + request.getDni());
-        }
 
-        // Primero creamos la entidad con el mapper
-        Usuario usuario = usuarioMapper.fromRegistroDTO(request); // <--- Minúscula
+        Usuario usuario = usuarioMapper.fromRegistroDTO(request); 
 
-        // Ahora aplicamos el Rol si viene en el request
+        usuario.setContrasena(passwordEncoder.encode(request.getContrasena()));
+
         if (request.getRol() != null && !request.getRol().isBlank()) {
             try {
                 usuario.setRol(Rol.valueOf(request.getRol().toUpperCase()));
@@ -99,7 +105,7 @@ public class UsuarioServices implements UserDetailsService{
         }
 
         Usuario guardado = usuarioRepository.save(usuario);
-        return usuarioMapper.toResponseDTO(guardado); // <--- Minúscula
+        return usuarioMapper.toResponseDTO(guardado);
     }
 
     // Cliente y admin
@@ -111,7 +117,7 @@ public class UsuarioServices implements UserDetailsService{
             throw new UsuarioException("Contraseña incorrecta");
         }
 
-        return usuarioMapper.toResponseDTO(usuario); // <--- Minúscula
+        return usuarioMapper.toResponseDTO(usuario);
     }
 
     // Cliente y admin
@@ -121,15 +127,14 @@ public class UsuarioServices implements UserDetailsService{
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
 
         if (usuarioRepository.existsByEmailAndIdNot(dto.getEmail(), id)) {
-            throw new UsuarioException("El email ya está en uso");
+            throw new UsuarioException("El email ya está en uso.");
         }
         
         if (dto.getDni() != null && usuarioRepository.existsByDniAndIdNot(dto.getDni(), id)) {
-            throw new UsuarioException("El DNI ya está en uso");
+            throw new UsuarioException("El DNI ya está en uso.");
         }
 
-        // Usamos la variable inyectada para actualizar
-        usuarioMapper.updateEntityFromDTO(dto, usuarioExistente); // <--- Minúscula
+        usuarioMapper.updateEntityFromDTO(dto, usuarioExistente); 
 
         if (dto.getRol() != null && !dto.getRol().isBlank()) {
             try {
@@ -140,7 +145,7 @@ public class UsuarioServices implements UserDetailsService{
         }
 
         Usuario actualizado = usuarioRepository.save(usuarioExistente);
-        return usuarioMapper.toResponseDTO(actualizado); // <--- Minúscula
+        return usuarioMapper.toResponseDTO(actualizado); 
     }
 
     
@@ -148,24 +153,19 @@ public class UsuarioServices implements UserDetailsService{
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
 
-        // 1. Verificar contraseña actual (cuando pongas Spring Security, aquí usarás passwordEncoder.matches)
-        if (!usuario.getContrasena().equals(dto.getContrasenaActual())) {
+        if (!passwordEncoder.matches(dto.getContrasenaActual(), usuario.getContrasena())) {
             throw new UsuarioException("La contraseña actual no es correcta");
         }
 
-        // 2. Verificar que la nueva y la confirmación coinciden
         if (!dto.getContrasenaNueva().equals(dto.getConfirmarContrasenaNueva())) {
             throw new UsuarioException("La nueva contraseña y su confirmación no coinciden");
         }
-
-        // 3. Opcional: Validar fortaleza de contraseña aquí
         
-        // 4. Actualizar
-        usuario.setContrasena(dto.getContrasenaNueva());
+        String contrasenaEncriptada = passwordEncoder.encode(dto.getContrasenaNueva());
+        usuario.setContrasena(contrasenaEncriptada);
+        
         usuarioRepository.save(usuario);
     }
-
-
 
     // Admin
     // Eliminar usuario
@@ -174,30 +174,30 @@ public class UsuarioServices implements UserDetailsService{
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
 
-        // 1. Recorremos sus vehículos (Relación USUARIO -> VEHICULO de tu dibujo)
         if (usuario.getVehiculos() != null) {
             for (Vehiculo v : usuario.getVehiculos()) {
                 
-                // 2. Recorremos las citas de cada vehículo (Relación VEHICULO -> CITA)
                 if (v.getCitas() != null) {
                     for (Cita cita : v.getCitas()) {
-                        cita.setVehiculo(null); // La soltamos para poder borrar
-                        cita.setEstado(com.daw.garage23.persistence.entities.enums.Estado.CANCELADA);
+                        cita.setVehiculo(null); 
+                        cita.setEstado(Estado.CANCELADA);
                     }
                     v.getCitas().clear();
                 }
             }
         }
 
-        // 3. Al borrar el usuario, se borrarán sus vehículos por CascadeType.ALL
         usuarioRepository.delete(usuario);
     }
 
- // Añade esto a UsuarioServices para que la seguridad funcione
     public boolean esElMismoUsuario(int id, String emailAutenticado) {
         UsuarioResponseDTO usuario = obtenerUsuarioPorId(id);
         return usuario.getEmail().equals(emailAutenticado);
     }
-	
-
+    
+    public int obtenerIdPorEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado con email: " + email));
+        return usuario.getId();
+    }
 }
