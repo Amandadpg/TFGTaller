@@ -2,25 +2,26 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../../../core/layout/header/header.component';
-import { SidebarComponent } from '../../../core/layout/sidebar/sidebar.component'; // <-- ¡AQUÍ INYECTAMOS EL MENÚ REAL!
+import { SidebarComponent } from '../../../core/layout/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
   imports: [CommonModule, RouterOutlet, HeaderComponent, SidebarComponent],
   template: `
-    <div class="flex h-screen bg-[#0a0a0a] text-white overflow-hidden">
+    <div class="flex h-screen bg-[#0a0a0a] text-white overflow-hidden relative">
       
-      <!-- MAGIA: Usamos el Sidebar oficial que acabamos de editar -->
-      <app-sidebar></app-sidebar>
+      <div *ngIf="sidebarOpen" (click)="sidebarOpen = false" 
+           class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 md:hidden transition-opacity">
+      </div>
 
-      <main class="flex-1 flex flex-col overflow-hidden bg-[#0a0a0a]">
-        <!-- Cabecera oficial -->
-        <app-header></app-header>
+      <app-sidebar [isOpen]="sidebarOpen" (closeMenu)="sidebarOpen = false" class="z-50"></app-sidebar>
 
-        <section id="main-content" class="flex-1 overflow-y-auto p-8">
+      <main class="flex-1 flex flex-col overflow-hidden bg-[#0a0a0a] w-full">
+        <app-header (toggleMenu)="sidebarOpen = !sidebarOpen"></app-header>
+
+        <section id="main-content" class="flex-1 overflow-y-auto p-4 md:p-8">
           <div class="max-w-7xl mx-auto">
-            <!-- Aquí dentro se cargan Citas, Usuarios, Vehículos, etc. -->
             <router-outlet></router-outlet>
           </div>
         </section>
@@ -30,7 +31,5 @@ import { SidebarComponent } from '../../../core/layout/sidebar/sidebar.component
   `
 })
 export class AdminDashboardComponent {
-  // ¡Fíjate qué limpio! 
-  // Ya no necesitamos la lista de 'navLinks' aquí porque el 'SidebarComponent' 
-  // oficial ya sabe qué botones mostrar gracias al *ngIf="isAdmin()".
+  sidebarOpen = false;
 }

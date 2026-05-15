@@ -12,37 +12,33 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="p-8">
-      <!-- CABECERA -->
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
+    <div class="p-4 md:p-8">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
+        <h1 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
           <span class="text-pink-500">📅</span> Gestión de Citas
         </h1>
-        <button (click)="mostrarFormularioNuevo()" class="bg-pink-600 hover:bg-pink-500 text-white font-bold py-2 px-6 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all uppercase tracking-widest text-sm">
+        <button (click)="mostrarFormularioNuevo()" class="w-full md:w-auto bg-pink-600 hover:bg-pink-500 text-white font-bold py-2.5 px-6 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all uppercase tracking-widest text-sm">
           + Programar Cita
         </button>
       </div>
 
-      <!-- BUSCADOR FLEXIBLE HASTA EL FINAL -->
-      <div class="mb-8 flex gap-4 h-[50px]">
+      <div class="mb-6 md:mb-8 flex gap-3 h-[50px]">
         <input 
           type="text" 
           [value]="textoBusquedaCita"
           (input)="filtrarDatosAlMomento($event)" 
-          placeholder="🔍 Buscar por nombre del cliente..." 
-          class="flex-1 bg-[#111] border border-gray-800 rounded-lg px-5 text-white outline-none focus:border-pink-500 transition-all text-base placeholder:text-gray-500"
+          placeholder="🔍 Buscar cliente..." 
+          class="flex-1 bg-[#111] border border-gray-800 rounded-lg px-4 text-white outline-none focus:border-pink-500 transition-all text-sm md:text-base placeholder:text-gray-500"
         >
-        <!-- BOTÓN LIMPIAR / RECARGAR -->
         <button (click)="limpiarBusquedaCitas()" class="bg-[#1e2330] hover:bg-[#2a3142] text-gray-400 hover:text-white w-[50px] rounded-lg transition-all border border-gray-700/50 flex items-center justify-center shrink-0 shadow-lg" title="Limpiar y recargar">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
       </div>
 
-      <!-- FORMULARIO NUEVA CITA -->
-      <div *ngIf="mostrarFormulario" class="bg-[#111] rounded-2xl shadow-xl border border-gray-800 border-t-4 border-t-pink-500 p-6 mb-8 animate-in fade-in zoom-in duration-300">
-        <h3 class="text-xl font-bold text-white mb-6 uppercase tracking-widest">{{ citaEditando ? 'Modificar Cita' : 'Nueva Entrada a Taller' }}</h3>
+      <div *ngIf="mostrarFormulario" class="bg-[#111] rounded-2xl shadow-xl border border-gray-800 border-t-4 border-t-pink-500 p-4 md:p-6 mb-8 animate-in fade-in zoom-in duration-300">
+        <h3 class="text-lg md:text-xl font-bold text-white mb-6 uppercase tracking-widest">{{ citaEditando ? 'Modificar Cita' : 'Nueva Entrada a Taller' }}</h3>
         
-        <form [formGroup]="citaForm" (ngSubmit)="guardarCita()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <form [formGroup]="citaForm" (ngSubmit)="guardarCita()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           <div class="relative">
             <label class="block text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Cliente</label>
             <input 
@@ -114,47 +110,45 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
             </select>
           </div>
 
-          <div class="col-span-full flex justify-end gap-3 pt-4 border-t border-gray-800">
-            <button type="button" (click)="cancelarFormulario()" class="px-6 py-3 text-gray-400 font-bold bg-gray-800 hover:bg-gray-700 rounded-lg transition-all uppercase tracking-widest text-xs">Cancelar</button>
-            <button type="submit" [disabled]="citaForm.invalid" class="px-8 py-3 text-white font-bold bg-pink-600 hover:bg-pink-500 rounded-lg shadow-lg shadow-pink-500/20 disabled:opacity-30 uppercase tracking-widest text-xs">Confirmar Cita</button>
+          <div class="col-span-full flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-gray-800">
+            <button type="button" (click)="cancelarFormulario()" class="w-full sm:w-auto px-6 py-3 text-gray-400 font-bold bg-gray-800 hover:bg-gray-700 rounded-lg transition-all uppercase tracking-widest text-xs">Cancelar</button>
+            <button type="submit" [disabled]="citaForm.invalid" class="w-full sm:w-auto px-8 py-3 text-white font-bold bg-pink-600 hover:bg-pink-500 rounded-lg shadow-lg shadow-pink-500/20 disabled:opacity-30 uppercase tracking-widest text-xs">Confirmar Cita</button>
           </div>
         </form>
       </div>
 
-      <!-- TABLA DE CITAS (AHORA USA CITAS FILTRADAS) -->
-      <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden shadow-2xl">
-        <table class="w-full text-left text-sm text-gray-300 border-collapse">
+      <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-x-auto shadow-2xl">
+        <table class="w-full min-w-[900px] text-left text-sm text-gray-300 border-collapse">
           <thead class="text-xs uppercase bg-gray-900/50 text-gray-400 border-b border-gray-800 tracking-widest">
             <tr>
-              <th class="px-6 py-5 font-bold">Fecha / Hora</th>
-              <th class="px-6 py-5 font-bold">Vehículo</th>
-              <th class="px-6 py-5 font-bold">Cliente</th>
-              <th class="px-6 py-5 font-bold">Servicio</th>
-              <th class="px-6 py-5 text-center font-bold">Estado</th>
-              <th class="px-6 py-5 text-right pr-28 font-bold w-64">Acciones</th>
+              <th class="px-6 py-5 font-bold whitespace-nowrap">Fecha / Hora</th>
+              <th class="px-6 py-5 font-bold whitespace-nowrap">Vehículo</th>
+              <th class="px-6 py-5 font-bold whitespace-nowrap">Cliente</th>
+              <th class="px-6 py-5 font-bold whitespace-nowrap">Servicio</th>
+              <th class="px-6 py-5 text-center font-bold whitespace-nowrap">Estado</th>
+              <th class="px-6 py-5 text-right pr-6 md:pr-10 font-bold w-48 whitespace-nowrap">Acciones</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-800/40">
             @for (cita of citasFiltradasTabla; track cita.id) {
               <tr class="hover:bg-gray-800/20 transition-colors group">
-                <td class="px-6 py-4">
+                <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-white font-bold">{{ cita.fecha | date:'dd/MM/yyyy' }}</div>
                   <div class="text-pink-500 font-mono text-xs">{{ cita.hora }}</div>
                 </td>
-                <td class="px-6 py-4">
+                <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-gray-200 font-bold uppercase tracking-tight">{{ cita.matriculaVehiculo }}</div>
                 </td>
-                <td class="px-6 py-4">
+                <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center gap-2">
                     <span class="text-gray-500">👤</span>
                     {{ obtenerNombrePropietario(cita.matriculaVehiculo) }}
                   </div>
                 </td>
-                <td class="px-6 py-4 italic text-gray-400">
+                <td class="px-6 py-4 italic text-gray-400 whitespace-nowrap max-w-[200px] truncate" [title]="cita.nombreServicio || 'Revisión General'">
                   {{ cita.nombreServicio || 'Revisión General' }}
                 </td>
-                <td class="px-6 py-4 text-center">
-                  <!-- Mantenemos los colores de estado porque aportan funcionalidad visual -->
+                <td class="px-6 py-4 text-center whitespace-nowrap">
                   <span [ngClass]="{
                     'bg-yellow-500/10 text-yellow-500': cita.estado === 'PENDIENTE',
                     'bg-blue-500/10 text-blue-500': cita.estado === 'EN_CURSO',
@@ -164,13 +158,13 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
                     {{ cita.estado }}
                   </span>
                 </td>
-                <td class="px-6 py-4 text-right pr-10">
+                <td class="px-6 py-4 text-right pr-6 md:pr-10 whitespace-nowrap">
                     <div class="flex justify-end items-center gap-4">
                       <div class="flex gap-2" *ngIf="cita.estado !== 'CANCELADA' && cita.estado !== 'COMPLETADA'">
                         <button (click)="cambiarEstadoRapido(cita, 'COMPLETADA')" class="hover:scale-125 transition-transform" title="Completar">✅</button>
                         <button (click)="cambiarEstadoRapido(cita, 'CANCELADA')" class="hover:scale-125 transition-transform" title="Rechazar">❌</button>
                       </div>
-                      <div class="w-[1px] h-4 bg-gray-700"></div>
+                      <div class="w-[1px] h-4 bg-gray-700 hidden sm:block"></div>
                       <div class="flex gap-1">
                         <button (click)="editarCita(cita)" class="p-2 text-gray-400 hover:text-pink-500 transition-colors">✏️</button>
                         <button (click)="eliminarCita(cita.id)" class="p-2 text-gray-400 hover:text-red-500 transition-colors">🗑️</button>
@@ -182,7 +176,6 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
           </tbody>
         </table>
 
-        <!-- MENSAJE DE TABLA VACÍA -->
         <div *ngIf="citasFiltradasTabla.length === 0" class="text-center py-12">
           <p class="text-gray-500 uppercase tracking-widest font-black text-xs">No se han encontrado citas</p>
         </div>

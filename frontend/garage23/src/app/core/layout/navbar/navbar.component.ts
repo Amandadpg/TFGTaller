@@ -15,32 +15,25 @@ import { filter } from 'rxjs';
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-20">
           
-          <!-- Logo -->
-          <div class="flex-shrink-0 cursor-pointer" routerLink="/">
-            <h1 class="text-2xl font-black tracking-widest text-primary drop-shadow-[0_0_10px_#E820BB] flex items-center gap-2 uppercase hover:scale-105 transition-transform">
-              GARAGE23AMG
-            </h1>
+          <div class="flex-shrink-0 cursor-pointer z-10 flex items-center" routerLink="/">
+            <img src="assets/logo.png" alt="Garage23 AMG" class="h-16 w-auto object-contain hover:scale-105 transition-transform" />
           </div>
           
-          <!-- Enlaces Centrales -->
-          <div class="hidden md:block">
-            <div class="ml-10 flex items-baseline space-x-8">
-              <a routerLink="/" class="text-gray-300 hover:text-white hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-black uppercase tracking-widest cursor-pointer">
-                Inicio
+          <div class="hidden md:flex items-baseline space-x-8 absolute left-1/2 transform -translate-x-1/2">
+            <a routerLink="/" class="text-gray-300 hover:text-white hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-black uppercase tracking-widest cursor-pointer">
+              Inicio
+            </a>
+            <a (click)="scrollToServicios()" class="text-gray-300 hover:text-white hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-black uppercase tracking-widest cursor-pointer">
+              Servicios
+            </a>
+            <ng-container *ngIf="isCliente()">
+              <a routerLink="/reservar" class="text-gray-300 hover:text-white hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-black uppercase tracking-widest cursor-pointer">
+                Reservar Cita
               </a>
-              <a (click)="scrollToServicios()" class="text-gray-300 hover:text-white hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-black uppercase tracking-widest cursor-pointer">
-                Servicios
-              </a>
-              <ng-container *ngIf="isCliente()">
-                <a routerLink="/reservar" class="text-gray-300 hover:text-white hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-black uppercase tracking-widest cursor-pointer">
-                  Reservar Cita
-                </a>
-              </ng-container>
-            </div>
+            </ng-container>
           </div>
           
-          <!-- Menú Derecho (Auth) -->
-          <div class="hidden md:flex items-center gap-4">
+          <div class="hidden md:flex items-center gap-4 z-10">
             <ng-container *ngIf="!isAuthenticated()">
               <a routerLink="/login" class="text-white hover:text-primary transition-colors font-bold text-sm tracking-widest uppercase">
                 Entrar
@@ -51,21 +44,16 @@ import { filter } from 'rxjs';
             </ng-container>
 
             <ng-container *ngIf="isAuthenticated()">
-              <!-- Si es admin, botón para ir al dashboard, aunque idealmente el admin está en su propia zona -->
               <a *ngIf="isAdmin()" routerLink="/admin/dashboard" class="text-primary font-bold text-sm tracking-widest uppercase hover:text-white transition-colors">
                 Panel Admin
               </a>
-              
-              <!-- Si es cliente, su perfil y salir -->
               <ng-container *ngIf="isCliente()">
                 <a routerLink="/client-dashboard" class="flex items-center gap-2 text-white hover:text-primary transition-colors font-bold text-sm tracking-widest uppercase group">
                   <svg class="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                   Mi Panel
                 </a>
               </ng-container>
-
               <div class="h-6 w-px bg-gray-800 mx-2"></div>
-              
               <button (click)="logout()" class="text-gray-400 hover:text-red-500 transition-colors font-bold text-sm tracking-widest uppercase flex items-center gap-1 group">
                 Salir
                 <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,14 +63,36 @@ import { filter } from 'rxjs';
             </ng-container>
           </div>
 
-          <!-- Botón menú móvil -->
-          <div class="-mr-2 flex md:hidden">
-            <button (click)="mobileMenuOpen = !mobileMenuOpen" type="button" class="bg-black inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-900 focus:outline-none">
-              <span class="sr-only">Abrir menú principal</span>
-              <svg *ngIf="!mobileMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <div class="flex items-center gap-4 md:hidden z-10">
+            
+            <ng-container *ngIf="!isAuthenticated()">
+              <a routerLink="/login" class="text-gray-200 hover:text-primary transition-colors" title="Iniciar Sesión">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+              </a>
+              <a routerLink="/registro" class="text-white hover:text-primary transition-colors relative" title="Registrarse">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                <span class="absolute -top-1 -right-2 text-primary font-bold text-lg leading-none">+</span>
+              </a>
+            </ng-container>
+
+            <ng-container *ngIf="isAuthenticated()">
+              <a *ngIf="isCliente() || isAdmin()" routerLink="/login" class="text-primary p-1" title="Mi Panel">
+                <svg class="w-7 h-7 drop-shadow-[0_0_5px_#E820BB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+              </a>
+            </ng-container>
+
+            <div class="h-6 w-px bg-gray-600 mx-1"></div>
+
+            <button (click)="mobileMenuOpen = !mobileMenuOpen" type="button" class="text-white hover:text-primary focus:outline-none transition-colors">
+              <span class="sr-only">Abrir menú</span>
+              <svg *ngIf="!mobileMenuOpen" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
-              <svg *ngIf="mobileMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <svg *ngIf="mobileMenuOpen" class="h-8 w-8 text-primary drop-shadow-[0_0_5px_#E820BB]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -90,22 +100,21 @@ import { filter } from 'rxjs';
         </div>
       </div>
 
-      <!-- Menú Móvil -->
-      <div *ngIf="mobileMenuOpen" class="md:hidden bg-black border-b border-gray-900">
-        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <a routerLink="/" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Inicio</a>
-          <a (click)="scrollToServicios()" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-black uppercase tracking-widest cursor-pointer">Servicios</a>
+      <div *ngIf="mobileMenuOpen" class="md:hidden bg-black/95 backdrop-blur-xl border-b border-gray-900 absolute w-full shadow-2xl">
+        <div class="px-4 pt-4 pb-6 space-y-3">
+          <a routerLink="/" class="text-gray-300 hover:text-white block px-3 py-3 rounded-md text-sm font-black uppercase tracking-widest border-b border-gray-800">Inicio</a>
+          <a (click)="scrollToServicios()" class="text-gray-300 hover:text-white block px-3 py-3 rounded-md text-sm font-black uppercase tracking-widest cursor-pointer border-b border-gray-800">Servicios</a>
           
           <ng-container *ngIf="!isAuthenticated()">
-            <a routerLink="/login" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Entrar</a>
-            <a routerLink="/registro" class="text-primary hover:text-white block px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Registrarse</a>
+            <a routerLink="/login" class="text-gray-300 hover:text-white block px-3 py-3 rounded-md text-sm font-black uppercase tracking-widest border-b border-gray-800 mt-4">Entrar</a>
+            <a routerLink="/registro" class="text-primary hover:text-pink-400 block px-3 py-3 rounded-md text-sm font-black uppercase tracking-widest border-b border-gray-800">Registrarse</a>
           </ng-container>
 
           <ng-container *ngIf="isAuthenticated()">
-            <a *ngIf="isCliente()" routerLink="/client-dashboard" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Mi Panel</a>
-            <a *ngIf="isCliente()" routerLink="/reservar" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Reservar Cita</a>
-            <a *ngIf="isAdmin()" routerLink="/admin/dashboard" class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Panel Admin</a>
-            <button (click)="logout()" class="text-red-500 hover:text-red-400 w-full text-left px-3 py-2 rounded-md text-base font-black uppercase tracking-widest">Salir</button>
+            <a *ngIf="isCliente()" routerLink="/client-dashboard" class="text-gray-300 hover:text-white block px-3 py-3 rounded-md text-sm font-black uppercase tracking-widest border-b border-gray-800 mt-4">Mi Panel</a>
+            <a *ngIf="isCliente()" routerLink="/reservar" class="text-gray-300 hover:text-white block px-3 py-3 rounded-md text-sm font-black uppercase tracking-widest border-b border-gray-800">Reservar Cita</a>
+            <a *ngIf="isAdmin()" routerLink="/admin/dashboard" class="text-primary hover:text-pink-400 block px-3 py-3 rounded-md text-sm font-black uppercase tracking-widest border-b border-gray-800 mt-4">Panel Admin</a>
+            <button (click)="logout()" class="text-red-500 hover:text-red-400 w-full text-left px-3 py-3 rounded-md text-sm font-black uppercase tracking-widest mt-2">Salir</button>
           </ng-container>
         </div>
       </div>
@@ -125,7 +134,6 @@ export class NavbarComponent {
       this.scrolled = window.scrollY > 20;
     });
 
-    // Close mobile menu on navigation
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
@@ -151,7 +159,6 @@ export class NavbarComponent {
   }
 
   scrollToServicios() {
-    // Si no estamos en la portada, navegamos primero
     if (this.router.url !== '/') {
       this.router.navigate(['/']).then(() => {
         setTimeout(() => this.doScroll(), 100);

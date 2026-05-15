@@ -12,38 +12,34 @@ import { CitaService } from '../../../../core/services/cita/cita.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="p-8">
+    <div class="p-4 md:p-8">
       
-      <!-- CABECERA -->
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
+        <h1 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
           <span class="text-pink-500">👥</span> Gestión de Usuarios
         </h1>
-        <button (click)="mostrarFormularioNuevo()" class="bg-pink-600 hover:bg-pink-500 text-white font-bold py-2.5 px-6 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all uppercase tracking-widest text-sm">
+        <button (click)="mostrarFormularioNuevo()" class="w-full md:w-auto bg-pink-600 hover:bg-pink-500 text-white font-bold py-2.5 px-6 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all uppercase tracking-widest text-sm">
           + Nuevo Usuario
         </button>
       </div>
 
-      <!-- BUSCADOR REACTIVO EN TIEMPO REAL -->
-      <div class="mb-8 flex gap-4 h-[50px]">
+      <div class="mb-6 md:mb-8 flex gap-3 h-[50px]">
         <input 
           type="text" 
           [value]="textoBusquedaUsuario"
           (input)="filtrarDatosAlMomento($event)"
-          placeholder="🔍 Buscar por nombre, apellidos o DNI..." 
-          class="flex-1 bg-[#111] border border-gray-800 rounded-lg px-5 text-white outline-none focus:border-pink-500 transition-all text-base placeholder:text-gray-500"
+          placeholder="🔍 Buscar DNI o nombre..." 
+          class="flex-1 bg-[#111] border border-gray-800 rounded-lg px-4 text-white outline-none focus:border-pink-500 transition-all text-sm md:text-base placeholder:text-gray-500"
         >
-        <!-- BOTÓN LIMPIAR / RECARGAR -->
         <button (click)="limpiarBusquedaUsuarios()" class="bg-[#1e2330] hover:bg-[#2a3142] text-gray-400 hover:text-white w-[50px] rounded-lg transition-all border border-gray-700/50 flex items-center justify-center shrink-0 shadow-lg" title="Limpiar y recargar">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
       </div>
 
-      <!-- FORMULARIO -->
-      <div *ngIf="mostrarFormulario" class="bg-[#111] rounded-2xl border border-gray-800 border-t-4 border-t-pink-500 p-6 mb-8 shadow-2xl animate-in fade-in zoom-in duration-300">
-        <h3 class="text-xl font-bold text-white mb-6 uppercase tracking-widest">{{ usuarioEditando ? 'Editar Usuario' : 'Registrar Nuevo Miembro' }}</h3>
+      <div *ngIf="mostrarFormulario" class="bg-[#111] rounded-2xl border border-gray-800 border-t-4 border-t-pink-500 p-4 md:p-6 mb-8 shadow-2xl animate-in fade-in zoom-in duration-300">
+        <h3 class="text-lg md:text-xl font-bold text-white mb-6 uppercase tracking-widest">{{ usuarioEditando ? 'Editar Usuario' : 'Registrar Nuevo Miembro' }}</h3>
         
-        <form [formGroup]="usuarioForm" (ngSubmit)="guardarUsuario()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <form [formGroup]="usuarioForm" (ngSubmit)="guardarUsuario()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           <div>
             <label class="block text-gray-500 text-[10px] font-black uppercase tracking-widest mb-2">Nombre</label>
             <input formControlName="nombre" class="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white outline-none focus:border-pink-500 transition-all h-[50px]">
@@ -80,23 +76,22 @@ import { CitaService } from '../../../../core/services/cita/cita.service';
             </select>
           </div>
 
-          <div class="col-span-full flex justify-end gap-3 mt-4 pt-6 border-t border-gray-800/50">
-            <button type="button" (click)="cancelarFormulario()" class="px-6 py-3 text-gray-400 font-bold uppercase text-xs tracking-widest bg-gray-800 hover:bg-gray-700 rounded-lg transition-all">Cancelar</button>
-            <button type="submit" [disabled]="usuarioForm.invalid" class="px-8 py-3 text-white bg-pink-600 hover:bg-pink-500 rounded-lg font-bold uppercase text-xs tracking-widest shadow-lg shadow-pink-500/20 disabled:opacity-30">Guardar Usuario</button>
+          <div class="col-span-full flex flex-col-reverse sm:flex-row justify-end gap-3 mt-4 pt-6 border-t border-gray-800/50">
+            <button type="button" (click)="cancelarFormulario()" class="w-full sm:w-auto px-6 py-3 text-gray-400 font-bold uppercase text-xs tracking-widest bg-gray-800 hover:bg-gray-700 rounded-lg transition-all">Cancelar</button>
+            <button type="submit" [disabled]="usuarioForm.invalid" class="w-full sm:w-auto px-8 py-3 text-white bg-pink-600 hover:bg-pink-500 rounded-lg font-bold uppercase text-xs tracking-widest shadow-lg shadow-pink-500/20 disabled:opacity-30">Guardar Usuario</button>
           </div>
         </form>
       </div>
 
-      <!-- TABLA DE USUARIOS -->
-      <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden shadow-2xl">
-        <table class="w-full text-left text-sm text-gray-300">
+      <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-x-auto shadow-2xl">
+        <table class="w-full min-w-[800px] text-left text-sm text-gray-300">
           <thead class="bg-gray-900/80 text-gray-500 text-xs uppercase tracking-widest border-b border-gray-800">
             <tr>
-              <th class="px-6 py-5 font-bold">ID</th>
-              <th class="px-6 py-5 font-bold text-white">Nombre Completo</th>
-              <th class="px-6 py-5 font-bold">DNI</th>
-              <th class="px-6 py-5 font-bold text-center">Rol</th>
-              <th class="px-6 py-5 text-right font-bold pr-14">Acciones</th>
+              <th class="px-6 py-5 font-bold whitespace-nowrap">ID</th>
+              <th class="px-6 py-5 font-bold text-white whitespace-nowrap">Nombre Completo</th>
+              <th class="px-6 py-5 font-bold whitespace-nowrap">DNI</th>
+              <th class="px-6 py-5 font-bold text-center whitespace-nowrap">Rol</th>
+              <th class="px-6 py-5 text-right font-bold pr-6 md:pr-14 whitespace-nowrap">Acciones</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-800/40">
@@ -109,17 +104,16 @@ import { CitaService } from '../../../../core/services/cita/cita.service';
               <td colspan="5" class="px-6 py-12 text-center text-gray-500 uppercase tracking-widest font-black text-xs">No se han encontrado usuarios</td>
             </tr>
             <tr *ngFor="let u of usuariosFiltradosTabla" class="hover:bg-gray-800/20 transition-colors group">
-              <td class="px-6 py-4 font-mono text-gray-600 text-xs">#{{ u.id }}</td>
-              <td class="px-6 py-4 font-bold text-white uppercase tracking-tight">{{ u.nombre }} {{ u.apellidos }}</td>
-              <td class="px-6 py-4 font-mono text-gray-400">{{ u.dni }}</td>
-              <td class="px-6 py-4 text-center">
-                <!-- ROLES: Cliente en Rosa, Admin en Blanco -->
+              <td class="px-6 py-4 font-mono text-gray-600 text-xs whitespace-nowrap">#{{ u.id }}</td>
+              <td class="px-6 py-4 font-bold text-white uppercase tracking-tight whitespace-nowrap">{{ u.nombre }} {{ u.apellidos }}</td>
+              <td class="px-6 py-4 font-mono text-gray-400 whitespace-nowrap">{{ u.dni }}</td>
+              <td class="px-6 py-4 text-center whitespace-nowrap">
                 <span [ngClass]="u.rol === 'ADMIN' ? 'bg-white/10 text-white border-white/20' : 'bg-pink-500/10 text-pink-500 border-pink-500/20'" 
                       class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border">
                   {{ u.rol }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-right pr-10">
+              <td class="px-6 py-4 text-right pr-6 md:pr-10 whitespace-nowrap">
                 <div class="flex justify-end gap-1 transition-opacity">
                   <button (click)="verDetalles(u)" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all" title="Ver Detalles">👁️</button>
                   <button (click)="editarUsuario(u)" class="p-2 text-gray-400 hover:text-pink-500 hover:bg-pink-500/10 rounded-lg transition-all" title="Editar">✏️</button>
@@ -131,18 +125,17 @@ import { CitaService } from '../../../../core/services/cita/cita.service';
         </table>
       </div>
 
-      <!-- MODAL FICHA CLIENTE -->
       <div *ngIf="usuarioSeleccionado" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-        <div class="bg-[#0a0a0a] w-full max-w-2xl rounded-3xl border border-gray-800 shadow-2xl overflow-hidden shadow-pink-500/5">
-          <div class="p-8 border-b border-gray-800 flex justify-between items-center bg-gradient-to-r from-pink-500/10 to-transparent">
+        <div class="bg-[#0a0a0a] w-full max-w-2xl rounded-3xl border border-gray-800 shadow-2xl overflow-hidden shadow-pink-500/5 max-h-[90vh] overflow-y-auto">
+          <div class="p-4 md:p-8 border-b border-gray-800 flex justify-between items-center bg-gradient-to-r from-pink-500/10 to-transparent sticky top-0 bg-[#0a0a0a] z-10">
             <div>
-              <h3 class="text-2xl font-black text-white uppercase tracking-tighter">Ficha del Cliente</h3>
+              <h3 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Ficha del Cliente</h3>
               <p class="text-pink-500 font-bold text-sm tracking-widest">{{ usuarioSeleccionado.nombre }} {{ usuarioSeleccionado.apellidos }}</p>
             </div>
-            <button (click)="usuarioSeleccionado = null" class="text-gray-500 hover:text-white text-3xl font-light transition-colors">&times;</button>
+            <button (click)="usuarioSeleccionado = null" class="text-gray-500 hover:text-white text-3xl font-light transition-colors px-2">&times;</button>
           </div>
           
-          <div class="p-8 grid grid-cols-2 gap-6">
+          <div class="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-4">
               <div>
                 <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1">Documento DNI</p>
@@ -156,7 +149,7 @@ import { CitaService } from '../../../../core/services/cita/cita.service';
             <div class="space-y-4">
               <div>
                 <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1">Correo Electrónico</p>
-                <p class="text-white truncate">{{ usuarioSeleccionado.email }}</p>
+                <p class="text-white truncate" [title]="usuarioSeleccionado.email">{{ usuarioSeleccionado.email }}</p>
               </div>
               <div>
                 <p class="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-1">Ubicación</p>
@@ -180,11 +173,7 @@ import { CitaService } from '../../../../core/services/cita/cita.service';
         </div>
       </div>
     </div>
-  `,
-  styles: [`
-    .animate-in { animation: fadeIn 0.3s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  `]
+  `
 })
 export class AdminUsuariosComponent implements OnInit {
   private fb = inject(FormBuilder);

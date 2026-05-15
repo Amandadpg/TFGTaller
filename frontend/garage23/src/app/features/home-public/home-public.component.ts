@@ -10,6 +10,7 @@ import { RouterLink } from '@angular/router';
 })
 export class HomePublicComponent {
   servicioActivo = 'mecanica';
+  menuAbierto = false;
 
   setServicio(tipo: string) {
     this.servicioActivo = tipo;

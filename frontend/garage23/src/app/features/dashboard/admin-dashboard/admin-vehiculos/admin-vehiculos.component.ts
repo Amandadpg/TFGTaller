@@ -10,38 +10,34 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="p-8">
+    <div class="p-4 md:p-8">
       
-      <!-- CABECERA -->
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
+        <h1 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
           <span class="text-pink-500">🚗</span> Gestión de Vehículos
         </h1>
-        <button (click)="mostrarFormularioNuevo()" class="bg-pink-600 hover:bg-pink-500 text-white font-bold py-2.5 px-6 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all uppercase tracking-widest text-sm">
+        <button (click)="mostrarFormularioNuevo()" class="w-full md:w-auto bg-pink-600 hover:bg-pink-500 text-white font-bold py-2.5 px-6 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.4)] transition-all uppercase tracking-widest text-sm">
           + Nuevo Vehículo
         </button>
       </div>
 
-      <!-- BUSCADOR REACTIVO EN TIEMPO REAL -->
-      <div class="mb-8 flex gap-4 h-[50px]">
+      <div class="mb-6 md:mb-8 flex gap-3 h-[50px]">
         <input 
           type="text" 
           [value]="textoBusquedaVehiculo"
           (input)="filtrarDatosAlMomento($event)" 
-          placeholder="🔍 Buscar por matrícula, marca o modelo..." 
-          class="flex-1 bg-[#111] border border-gray-800 rounded-lg px-5 text-white outline-none focus:border-pink-500 transition-all text-base placeholder:text-gray-500"
+          placeholder="🔍 Buscar por matrícula, marca..." 
+          class="flex-1 bg-[#111] border border-gray-800 rounded-lg px-4 text-white outline-none focus:border-pink-500 transition-all text-sm md:text-base placeholder:text-gray-500"
         >
-        <!-- BOTÓN LIMPIAR / RECARGAR -->
         <button (click)="limpiarBusquedaVehiculos()" class="bg-[#1e2330] hover:bg-[#2a3142] text-gray-400 hover:text-white w-[50px] rounded-lg transition-all border border-gray-700/50 flex items-center justify-center shrink-0 shadow-lg" title="Limpiar y recargar">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
       </div>
 
-      <!-- FORMULARIO -->
-      <div *ngIf="mostrarFormulario" class="bg-[#111] rounded-2xl shadow-xl border border-gray-800 border-t-4 border-t-pink-500 p-6 mb-8 animate-in fade-in zoom-in duration-300">
-        <h3 class="text-xl font-bold text-white mb-6 uppercase tracking-widest">{{ vehiculoEditando ? 'Editar Vehículo' : 'Añadir Vehículo al Taller' }}</h3>
+      <div *ngIf="mostrarFormulario" class="bg-[#111] rounded-2xl shadow-xl border border-gray-800 border-t-4 border-t-pink-500 p-4 md:p-6 mb-8 animate-in fade-in zoom-in duration-300">
+        <h3 class="text-lg md:text-xl font-bold text-white mb-6 uppercase tracking-widest">{{ vehiculoEditando ? 'Editar Vehículo' : 'Añadir Vehículo al Taller' }}</h3>
         
-        <form [formGroup]="vehiculoForm" (ngSubmit)="guardarVehiculo()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <form [formGroup]="vehiculoForm" (ngSubmit)="guardarVehiculo()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <div>
             <label class="block text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Matrícula</label>
             <input formControlName="matricula" class="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white outline-none focus:border-pink-500 uppercase transition-all h-[50px]">
@@ -55,7 +51,6 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
             <input formControlName="modelo" class="w-full bg-black border border-gray-800 rounded-lg px-4 py-3 text-white outline-none focus:border-pink-500 transition-all h-[50px]">
           </div>
           
-          <!-- BUSCADOR DE PROPIETARIO DENTRO DEL FORMULARIO -->
           <div class="relative lg:col-span-1">
             <label class="block text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Propietario</label>
             <div class="relative">
@@ -98,24 +93,23 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
             </select>
           </div>
 
-          <div class="col-span-full flex justify-end gap-3 pt-4 border-t border-gray-800">
-            <button type="button" (click)="cancelarFormulario()" class="px-6 py-3 text-gray-400 font-bold uppercase text-xs tracking-widest bg-gray-800 hover:bg-gray-700 rounded-lg transition-all">Cancelar</button>
-            <button type="submit" [disabled]="vehiculoForm.invalid" class="px-8 py-3 text-white font-bold uppercase text-xs tracking-widest bg-pink-600 hover:bg-pink-500 rounded-lg shadow-lg shadow-pink-500/20 disabled:opacity-50">Guardar Vehículo</button>
+          <div class="col-span-full flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-gray-800">
+            <button type="button" (click)="cancelarFormulario()" class="w-full sm:w-auto px-6 py-3 text-gray-400 font-bold uppercase text-xs tracking-widest bg-gray-800 hover:bg-gray-700 rounded-lg transition-all">Cancelar</button>
+            <button type="submit" [disabled]="vehiculoForm.invalid" class="w-full sm:w-auto px-8 py-3 text-white font-bold uppercase text-xs tracking-widest bg-pink-600 hover:bg-pink-500 rounded-lg shadow-lg shadow-pink-500/20 disabled:opacity-50">Guardar Vehículo</button>
           </div>
         </form>
       </div>
 
-      <!-- TABLA DE VEHÍCULOS -->
-      <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-hidden shadow-xl">
-        <table class="w-full text-left text-sm text-gray-300">
+      <div class="bg-[#111] rounded-2xl border border-gray-800 overflow-x-auto shadow-xl">
+        <table class="w-full min-w-[900px] text-left text-sm text-gray-300">
           <thead class="text-xs uppercase bg-gray-900/50 text-gray-400 border-b border-gray-800 tracking-widest">
             <tr>
-              <th class="px-6 py-5 font-bold">Matrícula</th>
-              <th class="px-6 py-5 font-bold">Marca</th>
-              <th class="px-6 py-5 font-bold">Modelo</th>
-              <th class="px-6 py-5 font-bold text-white">Propietario</th>
-              <th class="px-6 py-5 font-bold text-center">Tipo</th>
-              <th class="px-6 py-5 font-bold text-right pr-14 w-48">Acciones</th>
+              <th class="px-6 py-5 font-bold whitespace-nowrap">Matrícula</th>
+              <th class="px-6 py-5 font-bold whitespace-nowrap">Marca</th>
+              <th class="px-6 py-5 font-bold whitespace-nowrap">Modelo</th>
+              <th class="px-6 py-5 font-bold text-white whitespace-nowrap">Propietario</th>
+              <th class="px-6 py-5 font-bold text-center whitespace-nowrap">Tipo</th>
+              <th class="px-6 py-5 font-bold text-right pr-6 md:pr-14 w-48 whitespace-nowrap">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -128,21 +122,21 @@ import { ToastService } from '../../../../core/services/toast/toast.service';
               <td colspan="6" class="px-6 py-12 text-center text-gray-500 uppercase tracking-widest font-black text-xs">No se han encontrado vehículos</td>
             </tr>
             <tr *ngFor="let v of vehiculosFiltrados" class="border-b border-gray-800 hover:bg-gray-800/30 transition-colors group">
-              <td class="px-6 py-4 font-mono tracking-wider font-bold text-white">
+              <td class="px-6 py-4 font-mono tracking-wider font-bold text-white whitespace-nowrap">
                 <span class="bg-black px-3 py-1.5 rounded border border-gray-700 shadow-inner group-hover:border-pink-500/50 transition-colors">{{ v.matricula }}</span>
               </td>
-              <td class="px-6 py-4 text-white font-medium uppercase">{{ v.marca }}</td>
-              <td class="px-6 py-4">{{ v.modelo }}</td>
-              <td class="px-6 py-4 text-gray-300 font-medium">
+              <td class="px-6 py-4 text-white font-medium uppercase whitespace-nowrap">{{ v.marca }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ v.modelo }}</td>
+              <td class="px-6 py-4 text-gray-300 font-medium whitespace-nowrap">
                 <div class="flex items-center gap-2">
                   <span class="text-pink-500">👤</span>
                   {{ obtenerNombrePropietario(v.usuarioId) }}
                 </div>
               </td>
-              <td class="px-6 py-4 text-center">
+              <td class="px-6 py-4 text-center whitespace-nowrap">
                 <span class="text-[10px] font-black px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-gray-300 tracking-widest uppercase">{{ v.tipo }}</span>
               </td>
-              <td class="px-6 py-4 text-right pr-10">
+              <td class="px-6 py-4 text-right pr-6 md:pr-10 whitespace-nowrap">
                 <div class="flex justify-end items-center gap-2">
                   <button (click)="editarVehiculo(v)" class="p-2 text-gray-400 hover:text-pink-500 transition-colors" title="Editar">✏️</button>
                   <button (click)="eliminarVehiculo(v.id)" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Eliminar">🗑️</button>
