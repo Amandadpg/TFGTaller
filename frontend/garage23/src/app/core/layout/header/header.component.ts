@@ -27,7 +27,7 @@ import { CommonModule } from '@angular/common';
             <svg class="w-4 h-4 md:w-5 md:h-5 text-primary drop-shadow-[0_0_5px_#E820BB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
           </div>
           <span class="hidden sm:block text-xs md:text-sm font-semibold text-gray-300 cursor-pointer uppercase tracking-wider">
-            Usuario
+            Admin
           </span>
           <button (click)="logout()" class="ml-1 md:ml-2 text-[10px] md:text-xs text-gray-400 hover:text-white hover:bg-red-600/80 border border-transparent hover:border-red-500 transition-all duration-300 px-2 md:px-3 py-1.5 rounded-none font-bold uppercase tracking-widest active:scale-95 flex items-center gap-1.5 group">
             <span class="hidden sm:inline">Salir</span>
