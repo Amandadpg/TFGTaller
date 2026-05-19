@@ -1,0 +1,64 @@
+<main class="w-full min-h-screen bg-[#050505] pt-32 pb-20 px-6 font-sans text-white relative overflow-x-hidden">
+
+    <div
+        class="absolute top-0 right-0 w-[500px] h-[500px] bg-pink-600/10 blur-[150px] rounded-full pointer-events-none z-0">
+    </div>
+
+    <div class="max-w-6xl mx-auto relative z-10 animate-fade-in">
+
+        <header class="text-center mb-20 border-b border-white/5 pb-12">
+            <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-tight mb-4">
+                Últimas <span class="text-pink-600">Noticias</span>
+            </h1>
+            <p class="text-zinc-500 font-bold uppercase tracking-[0.3em] text-sm">Actualidad, proyectos y consejos del
+                garaje</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <article *ngFor="let noticia of listaNoticias" [routerLink]="['/noticias', noticia.id]"
+                class="bg-zinc-900/30 border border-white/5 rounded-3xl overflow-hidden hover:border-pink-600/50 hover:shadow-[0_0_30px_rgba(219,39,119,0.15)] transition-all group flex flex-col cursor-pointer">
+
+                <div
+                    class="h-48 w-full bg-[#0a0a0a] relative overflow-hidden flex items-center justify-center border-b border-white/5">
+
+                    <img [src]="noticia.imagen" alt="Noticia"
+                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+
+                    <div
+                        class="absolute inset-0 bg-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                    </div>
+
+                    <span
+                        class="absolute top-4 left-4 bg-black/80 backdrop-blur-md text-pink-600 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-white/10 z-10">
+                        {{ noticia.categoria }}
+                    </span>
+                </div>
+
+                <div class="p-8 flex-grow flex flex-col justify-between">
+                    <div>
+                        <time class="text-zinc-500 font-mono text-[10px] tracking-[0.2em] uppercase block mb-4">{{
+                            noticia.fecha }}</time>
+                        <h3
+                            class="text-xl font-black uppercase tracking-tight text-white mb-4 group-hover:text-pink-500 transition-colors leading-snug">
+                            {{ noticia.titulo }}
+                        </h3>
+                        <p class="text-zinc-400 text-xs leading-relaxed mb-6 font-bold uppercase line-clamp-3">
+                            {{ noticia.resumen }}
+                        </p>
+                    </div>
+
+                    <div class="pt-6 border-t border-white/5 mt-auto">
+                        <span
+                            class="text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 group-hover:text-pink-600 transition-colors">
+                            Leer artículo completo <span class="group-hover:translate-x-2 transition-transform">→</span>
+                        </span>
+                    </div>
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+</main>

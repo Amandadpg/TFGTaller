@@ -1,0 +1,109 @@
+<main class="w-full min-h-screen bg-[#050505] pt-32 pb-20 px-6 font-sans text-white relative">
+
+    <div class="max-w-3xl mx-auto p-8 relative z-10 animate-fade-in">
+
+        <div class="bg-zinc-900/30 rounded-3xl shadow-2xl border border-white/5 p-8 md:p-12 backdrop-blur-md">
+
+            <h2 class="text-3xl font-black uppercase text-white mb-8 flex items-center gap-3">
+                <span class="w-10 h-px bg-pink-600"></span>
+                Reservar Cita
+            </h2>
+
+            <div *ngIf="servicioSeleccionado"
+                class="bg-black/40 p-6 rounded-2xl border border-pink-600/20 mb-10 flex flex-col md:flex-row shadow-inner gap-6 items-center transition-all animate-fade-in">
+                <div class="flex-1">
+                    <span class="text-pink-600 text-[10px] font-black uppercase tracking-widest block mb-2">Has
+                        seleccionado</span>
+                    <h3 class="text-xl font-bold text-white uppercase tracking-tight">{{
+                        servicioSeleccionado.nombreServicio }}</h3>
+                    <p class="text-zinc-500 text-sm mt-2 line-clamp-2">{{ servicioSeleccionado.descripcion }}</p>
+                </div>
+                <div
+                    class="text-left md:text-right w-full md:w-auto border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-6">
+                    <span class="block text-xs font-bold text-zinc-600 uppercase tracking-widest mb-1">Precio
+                        Aprox.</span>
+                    <span class="text-3xl font-black text-white">{{ servicioSeleccionado.precio }}€</span>
+                </div>
+            </div>
+
+            <form [formGroup]="citaForm" (ngSubmit)="reservar()" class="space-y-8">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    <div class="group">
+                        <label
+                            class="block text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-3 group-focus-within:text-pink-500 transition-colors">
+                            1. ¿Qué necesitas?
+                        </label>
+                        <select formControlName="servicioId"
+                            class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-pink-600 focus:ring-1 focus:ring-pink-600 transition-all cursor-pointer">
+                            <option value="" disabled selected>Elige un servicio...</option>
+                            <option *ngFor="let s of serviciosLista" [value]="s.id">
+                                {{ s.nombreServicio }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="group">
+                        <label
+                            class="block text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-3 group-focus-within:text-pink-500 transition-colors">
+                            2. Tu Vehículo
+                        </label>
+                        <select formControlName="vehiculoId"
+                            class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-pink-600 focus:ring-1 focus:ring-pink-600 transition-all cursor-pointer">
+                            <option value="" disabled selected>Elige tu coche...</option>
+                            <option *ngFor="let v of vehiculos" [value]="v.id">
+                                {{ v.marca }} {{ v.modelo }} ({{ v.matricula }})
+                            </option>
+                        </select>
+
+                        <div *ngIf="vehiculos.length === 0"
+                            class="mt-4 p-4 bg-red-900/20 border border-red-500/30 rounded-xl flex items-start gap-3 text-red-400 text-xs">
+                            <p>No tienes vehículos. Añade uno en <a routerLink="/mis-vehiculos"
+                                    class="text-white font-bold hover:text-pink-500 underline">Mis Vehículos</a>.</p>
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <label
+                            class="block text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-3 group-focus-within:text-pink-500 transition-colors">
+                            3. Fecha
+                        </label>
+                        <input type="date" formControlName="fecha" [min]="fechaMinima"
+                            class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-pink-600 focus:ring-1 focus:ring-pink-600 transition-all cursor-pointer">
+                    </div>
+
+                    <div class="group">
+                        <label
+                            class="block text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-3 group-focus-within:text-pink-500 transition-colors">
+                            4. Hora
+                        </label>
+                        <select formControlName="hora"
+                            class="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-pink-600 focus:ring-1 focus:ring-pink-600 transition-all cursor-pointer">
+                            <option value="" disabled selected>Elige la hora...</option>
+                            <option *ngFor="let hora of horasDisponibles" [value]="hora">
+                                {{ hora }}
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-end gap-4">
+                    <button type="button" routerLink="/servicios"
+                        class="px-8 py-4 text-zinc-400 hover:text-white uppercase text-xs font-black tracking-widest transition-colors text-center">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" [disabled]="citaForm.invalid || vehiculos.length === 0 || isSubmitting"
+                        class="bg-pink-600 hover:bg-pink-500 text-white font-black text-xs uppercase tracking-widest py-4 px-10 rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+                        <span *ngIf="isSubmitting"
+                            class="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+                        {{ isSubmitting ? 'Procesando...' : 'Confirmar Reserva' }}
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</main>

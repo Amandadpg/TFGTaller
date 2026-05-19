@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -39,18 +40,19 @@ public class SecurityConfig {
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
-			    
-			    .requestMatchers("/usuarios/login", "/usuarios/registro").permitAll() 
-			    .requestMatchers("/auth/**").permitAll() 
-
-			    
-			    .requestMatchers("/citas/**").hasAnyAuthority("ADMIN", "CLIENTE")
-			    .requestMatchers("/vehiculos/**").hasAnyAuthority("ADMIN", "CLIENTE")
-			    .requestMatchers("/servicios/**").hasAnyAuthority("ADMIN", "CLIENTE")
-			    
-			    
-			    .anyRequest().authenticated()
-			) 
+				    // 1. Permite las peticiones de comprobación de Angular
+				    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+				    
+				    // 2. Rutas públicas unificadas (sin duplicados)
+				    .requestMatchers("/usuarios/login", "/usuarios/registro", "/auth/**").permitAll() 
+				    
+				    // 3. Rutas privadas (he añadido ROLE_ por si tu token los guarda así)
+				    .requestMatchers("/citas/**", "/vehiculos/**", "/servicios/**")
+				        .hasAnyAuthority("ADMIN", "CLIENTE", "ROLE_ADMIN", "ROLE_CLIENTE")
+				        
+				    // 4. Todo lo demás cerrado
+				    .anyRequest().authenticated()
+				)
 			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 			
 		return http.build();
